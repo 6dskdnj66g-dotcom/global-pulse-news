@@ -4,6 +4,7 @@ import ArticlePage from './pages/Article';
 import CategoryPage from './pages/Category';
 import LoginPage from './pages/Login';
 import SignupPage from './pages/Signup';
+import NotFound from './pages/NotFound';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/category/:category" element={<CategoryPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </AuthProvider>
         </Router>
