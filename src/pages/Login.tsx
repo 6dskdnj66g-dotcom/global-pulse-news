@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/layout/Layout';
-import { Lock, Mail, Apple } from 'lucide-react';
+import { Lock, Mail, Apple, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 
@@ -10,31 +10,43 @@ const LoginPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login } = useAuth();
+    const [error, setError] = useState('');
+    const { login, loginWithGoogle } = useAuth();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const isRtl = i18n.language === 'ar';
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (email && password) {
-            setLoading(true);
-            // Simulate API call
-            setTimeout(() => {
-                const name = email.split('@')[0];
-                login(email, name);
-                navigate('/');
-            }, 500);
+        setError('');
+        setLoading(true);
+
+        const result = await login(email, password);
+
+        if (result.success) {
+            navigate('/');
+        } else {
+            setError(result.error || (isRtl ? 'حدث خطأ' : 'An error occurred'));
         }
+        setLoading(false);
     };
 
-    const handleGoogleLogin = () => {
-        // TODO: Integrate with Firebase Google Auth
-        alert(isRtl ? 'تسجيل الدخول بجوجل قريباً!' : 'Google Sign-In coming soon!');
+    const handleGoogleLogin = async () => {
+        setError('');
+        setLoading(true);
+
+        const result = await loginWithGoogle();
+
+        if (result.success) {
+            navigate('/');
+        } else {
+            setError(result.error || (isRtl ? 'فشل تسجيل الدخول بجوجل' : 'Google sign-in failed'));
+        }
+        setLoading(false);
     };
 
     const handleAppleLogin = () => {
-        // TODO: Integrate with Firebase Apple Auth
+        // Apple Sign-In requires additional setup
         alert(isRtl ? 'تسجيل الدخول بأبل قريباً!' : 'Apple Sign-In coming soon!');
     };
 
@@ -55,11 +67,19 @@ const LoginPage: React.FC = () => {
                         </p>
                     </div>
 
+                    {/* Error Message */}
+                    {error && (
+                        <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 text-red-700 dark:text-red-400 px-4 py-3 rounded-xl text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     {/* Social Login Buttons */}
                     <div className="space-y-3">
                         <button
                             onClick={handleGoogleLogin}
-                            className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium"
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-3 py-3 px-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300 font-medium disabled:opacity-50"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -72,7 +92,8 @@ const LoginPage: React.FC = () => {
 
                         <button
                             onClick={handleAppleLogin}
-                            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-xl hover:bg-gray-900 transition-all duration-300 font-medium"
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-black text-white rounded-xl hover:bg-gray-900 transition-all duration-300 font-medium disabled:opacity-50"
                         >
                             <Apple size={20} />
                             <span>{isRtl ? 'تسجيل الدخول بـ Apple' : 'Continue with Apple'}</span>
@@ -122,7 +143,7 @@ const LoginPage: React.FC = () => {
                             className="w-full py-3 px-4 bg-primary hover:bg-primary-hover text-white font-bold rounded-xl transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {loading ? (
-                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 isRtl ? 'تسجيل الدخول' : 'Sign In'
                             )}
