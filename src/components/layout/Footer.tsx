@@ -66,10 +66,19 @@ const Footer: React.FC = () => {
                 <div className={`border-t border-black/5 dark:border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-sans uppercase tracking-widest text-muted ${isRtl ? 'md:flex-row-reverse' : ''}`}>
                     <span>{t('footer.copyright', { year: currentYear })}</span>
 
-                    {/* Designer Credit */}
-                    <div className="flex items-center gap-2 text-primary dark:text-accent">
-                        <span className="text-[11px] font-bold">
-                            {isRtl ? '✨ تم التصميم بواسطة حسنين صلاح' : '✨ Designed by Hassanein Salah'}
+                    {/* Designer Credit - 3D Effect */}
+                    <div className="flex items-center gap-2">
+                        <span
+                            className="text-[12px] font-black uppercase tracking-widest"
+                            style={{
+                                background: 'linear-gradient(135deg, #D4AF37 0%, #F5D77A 50%, #B8860B 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+                                filter: 'drop-shadow(1px 1px 1px rgba(212,175,55,0.5))'
+                            }}
+                        >
+                            ✨ DESIGNED BY HASANAIN SALAH ✨
                         </span>
                     </div>
 

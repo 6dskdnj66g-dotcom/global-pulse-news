@@ -8,6 +8,26 @@ interface NewsCardProps {
     article: Article;
 }
 
+// Time Ago Function (Arabic/English)
+const getTimeAgo = (dateString: string): string => {
+    const now = new Date();
+    const articleDate = new Date(dateString);
+    const diffMs = now.getTime() - articleDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    // Detect language from browser or default to English
+    const isArabic = document.documentElement.lang === 'ar';
+
+    if (diffMins < 1) return isArabic ? 'الآن' : 'Just now';
+    if (diffMins < 60) return isArabic ? `منذ ${diffMins} دقيقة` : `${diffMins}m ago`;
+    if (diffHours < 24) return isArabic ? `منذ ${diffHours} ساعة` : `${diffHours}h ago`;
+    if (diffDays < 7) return isArabic ? `منذ ${diffDays} يوم` : `${diffDays}d ago`;
+
+    return dateString; // Fallback to original date
+};
+
 const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
     const [isBookmarked, setIsBookmarked] = useState(false);
 
@@ -60,7 +80,6 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
             transitionSpeed={2000}
             className="h-full"
         >
-            {/* Always link internally, pass article data via state */}
             <Link
                 to={`/article/${article.id}`}
                 state={{ article }}
@@ -75,6 +94,14 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
                     <div className="absolute top-4 left-4">
                         <span className="bg-primary text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
                             {article.category}
+                        </span>
+                    </div>
+
+                    {/* Time Ago Badge */}
+                    <div className="absolute top-4 left-4 translate-y-8">
+                        <span className="bg-black/70 text-white text-[10px] font-bold px-2 py-1 backdrop-blur-sm flex items-center gap-1">
+                            <Clock size={10} />
+                            {getTimeAgo(article.date)}
                         </span>
                     </div>
 
@@ -116,8 +143,8 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
                             <span className="flex items-center gap-1">
                                 <User size={12} /> {article.author}
                             </span>
-                            <span className="flex items-center gap-1">
-                                <Clock size={12} /> {article.date}
+                            <span className="flex items-center gap-1 text-primary font-bold">
+                                <Clock size={12} /> {getTimeAgo(article.date)}
                             </span>
                         </div>
                     </div>
