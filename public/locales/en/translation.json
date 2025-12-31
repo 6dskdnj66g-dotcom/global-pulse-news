@@ -1,0 +1,61 @@
+{
+    "app": {
+        "title": "Global Pulse"
+    },
+    "nav": {
+        "home": "Home",
+        "politics": "Politics",
+        "economy": "Economy",
+        "technology": "Technology",
+        "sports": "Sports"
+    },
+    "header": {
+        "login": "Login",
+        "signup": "Sign Up",
+        "logout": "Log Out",
+        "english": "English",
+        "arabic": "Arabic",
+        "hello": "Hello, {{name}}"
+    },
+    "footer": {
+        "about_title": "Global Pulse",
+        "about_desc": "Your trusted source for real-time global news. Bringing the world closer to you with accurate and timely reporting.",
+        "quick_links": "Quick Links",
+        "categories": "Categories",
+        "copyright": "© {{year}} Global Pulse Media. All rights reserved.",
+        "newsletter_title": "The Daily Briefing",
+        "newsletter_desc": "Essential news, expert analysis, and exclusive content delivered straight to your inbox.",
+        "newsletter_placeholder": "Your email address",
+        "subscribe": "Sign Up",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "sitemap": "Sitemap",
+        "motto": "Delivering the truth with integrity and courage since 2025. Your daily source for global perspective."
+    },
+    "common": {
+        "loading": "Loading...",
+        "read_more": "Read More",
+        "share": "Share Article",
+        "min_read": "{{count}} min read",
+        "breaking": "BREAKING",
+        "latest_news": "Latest News",
+        "not_found": "Article Not Found",
+        "content_coming_soon": "Content coming soon...",
+        "related_articles": "Related Articles",
+        "search_placeholder": "Search for news, topics, or categories...",
+        "search_title": "Search News"
+    },
+    "auth": {
+        "signin_title": "Sign in to your account",
+        "signup_title": "Create your account",
+        "no_account": "Or {{link}} instead",
+        "create_account": "create a new account",
+        "has_account": "Already have an account? {{link}}",
+        "signin_link": "Sign in",
+        "email_placeholder": "Email address",
+        "password_placeholder": "Password",
+        "name_placeholder": "Full Name",
+        "submit_signin": "Sign in",
+        "submit_signup": "Create Account"
+    }
+}

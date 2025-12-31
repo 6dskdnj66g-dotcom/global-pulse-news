@@ -1,0 +1,61 @@
+{
+    "app": {
+        "title": "النبض العالمي"
+    },
+    "nav": {
+        "home": "الرئيسية",
+        "politics": "سياسة",
+        "economy": "اقتصاد",
+        "technology": "تكنولوجيا",
+        "sports": "رياضة"
+    },
+    "header": {
+        "login": "دخول",
+        "signup": "تسجيل",
+        "logout": "خروج",
+        "english": "English",
+        "arabic": "عربي",
+        "hello": "مرحباً، {{name}}"
+    },
+    "footer": {
+        "about_title": "النبض العالمي",
+        "about_desc": "مصدرك الموثوق للأخبار العالمية في الوقت الفعلي. نقرب العالم إليك بتقارير دقيقة وفي الوقت المناسب.",
+        "quick_links": "روابط سريعة",
+        "categories": "أقسام",
+        "copyright": "© {{year}} النبض العالمي. جميع الحقوق محفوظة.",
+        "newsletter_title": "الإيجاز اليومي",
+        "newsletter_desc": "أخبار أساسية وتحليلات الخبراء ومحتوى حصري يتم تسليمه مباشرة إلى بريدك الوارد.",
+        "newsletter_placeholder": "بريدك الإلكتروني",
+        "subscribe": "اشترك الآن",
+        "privacy": "سياسة الخصوصية",
+        "terms": "شروط الخدمة",
+        "sitemap": "خريطة الموقع",
+        "motto": "تقديم الحقيقة بنزاهة وشجاعة منذ عام 2025. مصدرك اليومي للمنظور العالمي."
+    },
+    "common": {
+        "loading": "جاري التحميل...",
+        "read_more": "اقرأ المزيد",
+        "share": "شارك المقال",
+        "min_read": "قراءة {{count}} دقيقة",
+        "breaking": "عاجل",
+        "latest_news": "آخر الأخبار",
+        "not_found": "المقال غير موجود",
+        "content_coming_soon": "المحتوى قريباً...",
+        "related_articles": "مقالات ذات صلة",
+        "search_placeholder": "ابحث عن الأخبار أو المواضيع أو الأقسام...",
+        "search_title": "البحث في الأخبار"
+    },
+    "auth": {
+        "signin_title": "تسجيل الدخول إلى حسابك",
+        "signup_title": "إنشاء حساب جديد",
+        "no_account": "أو {{link}} بدلاً من ذلك",
+        "create_account": "أنشئ حساباً جديداً",
+        "has_account": "لديك حساب بالفعل؟ {{link}}",
+        "signin_link": "سجل دخولك",
+        "email_placeholder": "البريد الإلكتروني",
+        "password_placeholder": "كلمة المرور",
+        "name_placeholder": "الاسم الكامل",
+        "submit_signin": "دخول",
+        "submit_signup": "إنشاء الحساب"
+    }
+}

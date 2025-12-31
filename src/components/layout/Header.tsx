@@ -1,0 +1,191 @@
+import React, { useState, useEffect } from 'react';
+import { Search, Menu, X, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { ModeToggle } from '../theme/ModeToggle';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../context/AuthContext';
+import SearchOverlay from '../common/SearchOverlay';
+
+const Header: React.FC = () => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const { t } = useTranslation();
+    const location = useLocation();
+    const { user, logout } = useAuth();
+
+    const navItems = [
+        { key: 'politics', path: '/category/politics' },
+        { key: 'economy', path: '/category/economy' },
+        { key: 'technology', path: '/category/technology' },
+        { key: 'sports', path: '/category/sports' },
+    ];
+
+    // Handle scroll effect
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Close menu on route change
+    useEffect(() => {
+        setIsMenuOpen(false);
+    }, [location]);
+
+    // Weather State
+    const [weather, setWeather] = useState<{ temp: number } | null>(null);
+
+    useEffect(() => {
+        // Fetch Weather (Riyadh/Global Default)
+        fetch('https://api.open-meteo.com/v1/forecast?latitude=24.7136&longitude=46.6753&current_weather=true')
+            .then(res => res.json())
+            .then(data => {
+                if (data.current_weather) {
+                    setWeather({ temp: Math.round(data.current_weather.temperature) });
+                }
+            })
+            .catch(err => console.error("Weather fetch failed", err));
+    }, []);
+
+    const dateString = new Date().toLocaleDateString(t('locale') === 'ar' ? 'ar-SA' : 'en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+
+    return (
+        <>
+            <header className={`bg-background text-foreground border-b border-black/10 dark:border-white/10 transition-all duration-300 ${isScrolled ? 'sticky top-0 z-50 shadow-md' : ''}`}>
+
+                {/* Top Tools Bar */}
+                <div className="container py-1 flex justify-between items-center text-[11px] font-sans tracking-tight uppercase border-b border-border/50">
+                    <div className="flex items-center gap-4">
+                        <button className="hover:text-primary-accent transition-colors" onClick={() => setIsSearchOpen(true)}>
+                            <Search size={14} />
+                        </button>
+                        <div className="hidden sm:block opacity-60">
+                            {dateString}
+                        </div>
+                        {/* Weather Widget (New) */}
+                        {weather && (
+                            <div className="flex items-center gap-1 opacity-80 border-s border-border/50 ps-4">
+                                <span className="text-yellow-500">☀</span>
+                                <span>{weather.temp}°C</span>
+                                <span className="hidden sm:inline text-[9px] opacity-60 ms-1">RIYADH</span>
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <LanguageSwitcher />
+                        <ModeToggle />
+                        {user ? (
+                            <div className="flex items-center gap-3">
+                                <span className="hidden md:inline font-bold text-primary-accent">Hello, {user.name}</span>
+                                <button onClick={logout} className="hover:text-red-500 transition-colors font-bold">Log out</button>
+                            </div>
+                        ) : (
+                            <Link to="/login" className="flex items-center gap-1 font-bold hover:text-primary-accent transition-colors">
+                                <User size={12} /> Log in
+                            </Link>
+                        )}
+                    </div>
+                </div>
+
+                {/* Masthead (Logo) */}
+                <div className="container py-6 relative flex justify-center items-center">
+                    <button
+                        className="md:hidden absolute left-4 p-2"
+                        onClick={() => setIsMenuOpen(true)}
+                    >
+                        <Menu size={24} />
+                    </button>
+
+                    <Link to="/" className="text-center group">
+                        <h1 className="text-4xl md:text-6xl font-serif font-black tracking-tight leading-normal pb-2 group-hover:opacity-90 transition-opacity">
+                            {t('app.title')}
+                        </h1>
+                        <div className="mt-2 text-[10px] md:text-xs font-sans uppercase tracking-[0.2em] opacity-60 border-t border-b border-black/10 dark:border-white/10 py-1 inline-block px-4">
+                            Est. 2025 • Daily Edition
+                        </div>
+                    </Link>
+                </div>
+
+                {/* Navigation Bar (Desktop) */}
+                <div className="border-t border-b border-black/10 dark:border-white/10 hidden md:block">
+                    <nav className="container flex justify-center">
+                        <div className="flex py-3 gap-8 font-sans text-xs font-bold uppercase tracking-widest">
+                            <Link to="/" className={`hover:text-primary-accent transition-colors ${location.pathname === '/' ? 'text-primary-accent' : ''}`}>
+                                {t('nav.home')}
+                            </Link>
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.key}
+                                    to={item.path}
+                                    className={`hover:text-primary-accent transition-colors relative group ${location.pathname === item.path ? 'text-primary-accent' : ''}`}
+                                >
+                                    {t(`nav.${item.key}`)}
+                                </Link>
+                            ))}
+                        </div>
+                    </nav>
+                </div>
+            </header>
+
+            <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+
+            {/* Mobile Drawer */}
+            {isMenuOpen && (
+                <div className="fixed inset-0 z-[60] flex md:hidden">
+                    <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+                    <div className="relative w-[300px] bg-background h-full shadow-2xl p-6 flex flex-col border-r border-border overflow-y-auto">
+                        <div className="flex justify-between items-center mb-8 border-b pb-4">
+                            <span className="font-serif font-bold text-xl">{t('app.title')}</span>
+                            <button onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+                        </div>
+
+                        {/* Mobile Auth Status */}
+                        <div className="mb-6 p-4 bg-secondary/5 rounded-lg">
+                            {user ? (
+                                <div>
+                                    <p className="font-bold mb-2">Welcome, {user.name}</p>
+                                    <button onClick={logout} className="text-xs uppercase tracking-widest text-red-500 font-bold">Sign Out</button>
+                                </div>
+                            ) : (
+                                <Link to="/login" className="flex items-center gap-2 font-bold text-primary-accent" onClick={() => setIsMenuOpen(false)}>
+                                    <User size={16} /> Sign In
+                                </Link>
+                            )}
+                        </div>
+
+                        <nav className="space-y-6">
+                            <Link
+                                to="/"
+                                className="block text-xl font-serif font-bold hover:text-primary-accent border-l-2 border-transparent hover:border-primary-accent pl-4 transition-all"
+                                onClick={() => setIsMenuOpen(false)}
+                            >
+                                {t('nav.home')}
+                            </Link>
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.key}
+                                    to={item.path}
+                                    className="block text-xl font-serif font-bold hover:text-primary-accent border-l-2 border-transparent hover:border-primary-accent pl-4 transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    {t(`nav.${item.key}`)}
+                                </Link>
+                            ))}
+                        </nav>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
+export default Header;
