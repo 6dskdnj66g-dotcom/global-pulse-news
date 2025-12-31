@@ -34,8 +34,12 @@ export const signInWithGoogle = async () => {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
 
-        // Save user to Firestore
-        await saveUserToFirestore(user);
+        // Try to save to Firestore, but don't block login if it fails (e.g. permission issues)
+        try {
+            await saveUserToFirestore(user);
+        } catch (dbError) {
+            console.warn('Firestore write failed (likely permission issues), but Auth successful:', dbError);
+        }
 
         return { success: true, user };
     } catch (error: any) {
