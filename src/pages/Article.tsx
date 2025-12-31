@@ -1,8 +1,8 @@
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { mockArticles } from '../data/mockData';
-import { Calendar, User, Clock, Share2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { mockArticles, Article } from '../data/mockData';
+import { Calendar, User, Clock, Share2, ArrowRight, ArrowLeft, ExternalLink } from 'lucide-react';
 import SEO from '../components/common/SEO';
 import { useTranslation } from 'react-i18next';
 import NewsCard from '../components/news/NewsCard';
@@ -10,8 +10,13 @@ import NewsCard from '../components/news/NewsCard';
 const ArticlePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { t, i18n } = useTranslation();
-    const article = mockArticles.find(a => a.id === id);
+    const location = useLocation();
     const isRtl = i18n.language === 'ar';
+
+    // Try to get article from navigation state (for real RSS articles)
+    // Fallback to mockArticles for static articles
+    const stateArticle = (location.state as { article?: Article })?.article;
+    const article = stateArticle || mockArticles.find(a => a.id === id);
 
     if (!article) {
         return (
@@ -19,10 +24,15 @@ const ArticlePage: React.FC = () => {
                 <SEO title={t('common.not_found')} />
                 <div className="container px-4 py-16 text-center">
                     <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200">{t('common.not_found')}</h2>
+                    <Link to="/" className="text-primary mt-4 inline-block hover:underline">
+                        {isRtl ? '← العودة للرئيسية' : '← Back to Home'}
+                    </Link>
                 </div>
             </Layout>
         );
     }
+
+    const isExternalArticle = article.sourceUrl && article.sourceUrl !== '#' && article.sourceUrl.startsWith('http');
 
     const relatedArticles = mockArticles
         .filter(a => a.category === article.category && a.id !== article.id)
@@ -39,10 +49,17 @@ const ArticlePage: React.FC = () => {
             <article className={`container px-4 pb-16 animate-fade-in ${isRtl ? 'text-right' : 'text-left'}`}>
                 {/* Article Header */}
                 <header className={`my-8 md:mb-12 max-w-4xl mx-auto ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
-                    <span className="text-primary font-bold uppercase tracking-wider text-sm bg-primary/10 px-3 py-1 rounded-full">
-                        {t(`nav.${article.category.toLowerCase()}`)}
-                    </span>
-                    <h1 className="text-3xl md:text-5xl font-bold mt-6 leading-tight text-secondary dark:text-white font-serif">
+                    <div className="flex items-center gap-3 flex-wrap mb-6">
+                        <span className="text-primary font-bold uppercase tracking-wider text-sm bg-primary/10 px-3 py-1 rounded-full">
+                            {t(`nav.${article.category.toLowerCase()}`)}
+                        </span>
+                        {article.source && (
+                            <span className="text-xs bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full font-medium">
+                                Via {article.source}
+                            </span>
+                        )}
+                    </div>
+                    <h1 className="text-3xl md:text-5xl font-bold leading-tight text-secondary dark:text-white font-serif">
                         {article.title}
                     </h1>
 
@@ -57,13 +74,13 @@ const ArticlePage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                             <Clock size={16} />
-                            <span>{t('common.min_read', { count: 5 })}</span>
+                            <span>{t('common.min_read', { count: 3 })}</span>
                         </div>
                     </div>
                 </header>
 
                 {/* Featured Image */}
-                <div className="rounded-xl overflow-hidden max-h-[600px] mb-12 shadow-2xl relative group">
+                <div className="rounded-xl overflow-hidden max-h-[500px] mb-12 shadow-2xl relative group max-w-4xl mx-auto">
                     <img
                         src={article.imageUrl}
                         alt={article.title}
@@ -72,24 +89,63 @@ const ArticlePage: React.FC = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                 </div>
 
-                {/* Article Content */}
+                {/* Article Summary & Content */}
                 <div className="max-w-3xl mx-auto">
-                    <div className="prose dark:prose-invert prose-xl font-serif">
-                        <p className={`text-xl md:text-2xl leading-relaxed mb-10 text-slate-800 dark:text-slate-200 font-medium italic ${isRtl ? 'border-r-8' : 'border-l-8'} border-primary/40 ${isRtl ? 'pr-8' : 'pl-8'}`}>
+                    {/* Executive Summary */}
+                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 md:p-8 mb-10">
+                        <h2 className="text-lg font-bold uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
+                            📋 {isRtl ? 'ملخص الخبر' : 'Executive Summary'}
+                        </h2>
+                        <p className="text-xl md:text-2xl leading-relaxed text-slate-800 dark:text-slate-200 font-serif">
                             {article.excerpt}
                         </p>
-
-                        <div
-                            className="text-slate-700 dark:text-slate-300 space-y-8 article-body text-lg md:text-xl leading-loose"
-                            dangerouslySetInnerHTML={{ __html: article.content || `<p>${t('common.content_coming_soon')}</p>` }}
-                        />
                     </div>
 
+                    {/* Full Article Content (if available) */}
+                    {article.content && (
+                        <div className="prose dark:prose-invert prose-xl font-serif mb-10">
+                            <div
+                                className="text-slate-700 dark:text-slate-300 space-y-6 article-body text-lg leading-loose"
+                                dangerouslySetInnerHTML={{ __html: article.content }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Read Full Article Button (for external sources) */}
+                    {isExternalArticle && (
+                        <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 md:p-8 text-center mb-10">
+                            <p className="text-slate-600 dark:text-slate-400 mb-4 font-medium">
+                                {isRtl
+                                    ? `للقراءة الكاملة للمقال من المصدر الأصلي (${article.source}):`
+                                    : `Read the full article from ${article.source}:`
+                                }
+                            </p>
+                            <a
+                                href={article.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-3 bg-primary hover:bg-primary-hover text-white font-bold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                            >
+                                <ExternalLink size={20} />
+                                {isRtl ? 'قراءة المقال الكامل' : 'Read Full Article'}
+                                {!isRtl && <ArrowRight size={20} />}
+                                {isRtl && <ArrowLeft size={20} />}
+                            </a>
+                        </div>
+                    )}
+
                     {/* Share Actions */}
-                    <div className={`mt-16 pt-8 border-t border-border flex flex-wrap items-center gap-4 ${isRtl ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`mt-10 pt-8 border-t border-border flex flex-wrap items-center gap-4 ${isRtl ? 'justify-end' : 'justify-start'}`}>
                         <span className="text-sm font-bold uppercase tracking-widest text-muted">{t('common.share')}:</span>
                         <div className="flex gap-2">
-                            <button className="p-3 rounded-full border border-border hover:bg-primary hover:text-white hover:border-primary transition-all duration-300">
+                            <button
+                                onClick={() => {
+                                    const url = article.sourceUrl || window.location.href;
+                                    navigator.clipboard.writeText(url);
+                                    alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                }}
+                                className="p-3 rounded-full border border-border hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
+                            >
                                 <Share2 size={20} />
                             </button>
                         </div>
@@ -109,8 +165,8 @@ const ArticlePage: React.FC = () => {
                             </Link>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                            {relatedArticles.map(article => (
-                                <NewsCard key={article.id} article={article} />
+                            {relatedArticles.map(relatedArticle => (
+                                <NewsCard key={relatedArticle.id} article={relatedArticle} />
                             ))}
                         </div>
                     </section>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Clock, User, Bookmark, Share2, ExternalLink } from 'lucide-react';
+import { Clock, User, Bookmark, Share2 } from 'lucide-react';
 import { Article } from '../../data/mockData';
 import Tilt from 'react-parallax-tilt';
 
@@ -10,9 +10,6 @@ interface NewsCardProps {
 
 const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
     const [isBookmarked, setIsBookmarked] = useState(false);
-
-    // Check if this is a real RSS article (has sourceUrl) or a mock article
-    const isExternalArticle = article.sourceUrl && article.sourceUrl !== '#' && article.sourceUrl.startsWith('http');
 
     useEffect(() => {
         const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
@@ -38,7 +35,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
     const handleShare = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        const shareUrl = isExternalArticle ? article.sourceUrl! : (window.location.origin + `/article/${article.id}`);
+        const shareUrl = article.sourceUrl || (window.location.origin + `/article/${article.id}`);
         if (navigator.share) {
             try {
                 await navigator.share({
@@ -55,69 +52,6 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
         }
     };
 
-    // Card Content (shared between Link and a tag)
-    const CardContent = (
-        <>
-            <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                    src={article.imageUrl}
-                    alt={article.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale-[20%] group-hover:grayscale-0"
-                />
-                <div className="absolute top-4 left-4">
-                    <span className="bg-primary text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
-                        {article.category}
-                    </span>
-                </div>
-
-                {/* Actions Overlay */}
-                <div className="absolute top-4 right-4 flex gap-2">
-                    <button
-                        onClick={toggleBookmark}
-                        className={`p-2 rounded-full backdrop-blur-md transition-colors ${isBookmarked ? 'bg-primary text-white' : 'bg-black/30 text-white hover:bg-black/50'}`}
-                    >
-                        <Bookmark size={16} fill={isBookmarked ? "currentColor" : "none"} />
-                    </button>
-                    <button
-                        onClick={handleShare}
-                        className="p-2 rounded-full bg-black/30 text-white hover:bg-black/50 backdrop-blur-md transition-colors"
-                    >
-                        <Share2 size={16} />
-                    </button>
-                </div>
-
-                {/* Source Badge */}
-                {article.source && (
-                    <div className="absolute bottom-4 right-4 bg-black/80 text-white text-[10px] font-bold px-2 py-1 backdrop-blur-sm flex items-center gap-1">
-                        {isExternalArticle && <ExternalLink size={10} />}
-                        Via {article.source}
-                    </div>
-                )}
-            </div>
-
-            <div className="p-6 flex flex-col h-full border-t border-black/5 dark:border-white/5">
-                <h3 className="text-xl md:text-2xl font-serif font-bold leading-tight mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                    {article.title}
-                </h3>
-
-                <p className="text-muted text-sm leading-relaxed mb-6 line-clamp-3 font-serif opacity-80">
-                    {article.excerpt}
-                </p>
-
-                <div className="mt-auto flex items-center justify-between text-xs text-muted/60 font-sans border-t border-black/5 dark:border-white/5 pt-4">
-                    <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                            <User size={12} /> {article.author}
-                        </span>
-                        <span className="flex items-center gap-1">
-                            <Clock size={12} /> {article.date}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
-
     return (
         <Tilt
             tiltMaxAngleX={2}
@@ -126,25 +60,69 @@ const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
             transitionSpeed={2000}
             className="h-full"
         >
-            {isExternalArticle ? (
-                // External Link (opens original source in new tab)
-                <a
-                    href={article.sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block h-full bg-paper dark:bg-zinc-900 border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-xl relative overflow-hidden"
-                >
-                    {CardContent}
-                </a>
-            ) : (
-                // Internal Link (opens our Article page)
-                <Link
-                    to={`/article/${article.id}`}
-                    className="group block h-full bg-paper dark:bg-zinc-900 border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-xl relative overflow-hidden"
-                >
-                    {CardContent}
-                </Link>
-            )}
+            {/* Always link internally, pass article data via state */}
+            <Link
+                to={`/article/${article.id}`}
+                state={{ article }}
+                className="group block h-full bg-paper dark:bg-zinc-900 border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20 transition-all duration-500 hover:shadow-xl relative overflow-hidden"
+            >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                    <img
+                        src={article.imageUrl}
+                        alt={article.title}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 filter grayscale-[20%] group-hover:grayscale-0"
+                    />
+                    <div className="absolute top-4 left-4">
+                        <span className="bg-primary text-white text-xs font-bold px-3 py-1 uppercase tracking-wider">
+                            {article.category}
+                        </span>
+                    </div>
+
+                    {/* Actions Overlay */}
+                    <div className="absolute top-4 right-4 flex gap-2">
+                        <button
+                            onClick={toggleBookmark}
+                            className={`p-2 rounded-full backdrop-blur-md transition-colors ${isBookmarked ? 'bg-primary text-white' : 'bg-black/30 text-white hover:bg-black/50'}`}
+                        >
+                            <Bookmark size={16} fill={isBookmarked ? "currentColor" : "none"} />
+                        </button>
+                        <button
+                            onClick={handleShare}
+                            className="p-2 rounded-full bg-black/30 text-white hover:bg-black/50 backdrop-blur-md transition-colors"
+                        >
+                            <Share2 size={16} />
+                        </button>
+                    </div>
+
+                    {/* Source Badge */}
+                    {article.source && (
+                        <div className="absolute bottom-4 right-4 bg-black/80 text-white text-[10px] font-bold px-2 py-1 backdrop-blur-sm">
+                            Via {article.source}
+                        </div>
+                    )}
+                </div>
+
+                <div className="p-6 flex flex-col h-full border-t border-black/5 dark:border-white/5">
+                    <h3 className="text-xl md:text-2xl font-serif font-bold leading-tight mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                        {article.title}
+                    </h3>
+
+                    <p className="text-muted text-sm leading-relaxed mb-6 line-clamp-3 font-serif opacity-80">
+                        {article.excerpt}
+                    </p>
+
+                    <div className="mt-auto flex items-center justify-between text-xs text-muted/60 font-sans border-t border-black/5 dark:border-white/5 pt-4">
+                        <div className="flex items-center gap-4">
+                            <span className="flex items-center gap-1">
+                                <User size={12} /> {article.author}
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <Clock size={12} /> {article.date}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </Link>
         </Tilt>
     );
 };
