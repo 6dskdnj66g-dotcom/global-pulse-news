@@ -65,6 +65,14 @@ const Footer: React.FC = () => {
 
                 <div className={`border-t border-black/5 dark:border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-sans uppercase tracking-widest text-muted ${isRtl ? 'md:flex-row-reverse' : ''}`}>
                     <span>{t('footer.copyright', { year: currentYear })}</span>
+
+                    {/* Designer Credit */}
+                    <div className="flex items-center gap-2 text-primary dark:text-accent">
+                        <span className="text-[11px] font-bold">
+                            {isRtl ? '✨ تم التصميم بواسطة حسنين صلاح' : '✨ Designed by Hassanein Salah'}
+                        </span>
+                    </div>
+
                     <div className="flex gap-6">
                         <Link to="#" className="hover:text-foreground">{t('footer.privacy')}</Link>
                         <Link to="#" className="hover:text-foreground">{t('footer.terms')}</Link>

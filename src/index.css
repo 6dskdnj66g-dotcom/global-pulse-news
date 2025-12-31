@@ -4,19 +4,31 @@
 
 @layer base {
   :root {
-    --color-background: #ffffff;
+    --color-background: #fafafa;
     --color-text: #0f172a;
     --color-muted: #64748b;
-    --color-border: #f1f5f9;
-    /* Lighter border for subtlety */
+    --color-border: #e2e8f0;
+    --color-paper: #ffffff;
+    --color-primary: #B8860B;
+    --color-primary-hover: #996F09;
+    --color-accent: #D4AF37;
   }
 
   .dark {
-    --color-background: #020617;
-    /* Deeper, richer dark mode (Slate 950) */
-    --color-text: #f8fafc;
-    --color-muted: #94a3b8;
-    --color-border: #1e293b;
+    --color-background: #0f172a;
+    /* Improved: Slate 900 instead of 950 for better readability */
+    --color-text: #f1f5f9;
+    /* Brighter text for better contrast */
+    --color-muted: #cbd5e1;
+    /* Lighter muted color for visibility */
+    --color-border: #334155;
+    /* More visible borders */
+    --color-paper: #1e293b;
+    /* Card backgrounds */
+    --color-primary: #D4AF37;
+    /* Brighter gold in dark mode */
+    --color-primary-hover: #E5C158;
+    --color-accent: #F5D77A;
   }
 
   body {
@@ -32,6 +44,26 @@
   h6 {
     @apply font-serif font-bold tracking-tight;
   }
+
+  /* Improved Dark Mode Text Visibility */
+  .dark p,
+  .dark span,
+  .dark li {
+    color: #e2e8f0;
+  }
+
+  .dark .text-muted {
+    color: #94a3b8 !important;
+  }
+
+  /* Better link visibility in dark mode */
+  .dark a:not(.bg-primary) {
+    color: inherit;
+  }
+
+  .dark a:hover {
+    color: var(--color-accent);
+  }
 }
 
 /* Custom Scrollbar */
@@ -44,11 +76,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 dark:bg-slate-700 rounded-full;
+  @apply bg-slate-300 dark:bg-slate-600 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-300 dark:bg-slate-600;
+  @apply bg-slate-400 dark:bg-slate-500;
 }
 
 /* Clean up 3D utilities */
@@ -64,4 +96,17 @@
   .backface-hidden {
     backface-visibility: hidden;
   }
+}
+
+/* Dark Mode Card Improvements */
+.dark .bg-paper {
+  background-color: #1e293b;
+}
+
+.dark .border-black\/5 {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .border-black\/10 {
+  border-color: rgba(255, 255, 255, 0.15);
 }
