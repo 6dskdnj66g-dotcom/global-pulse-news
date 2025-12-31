@@ -9,20 +9,20 @@
     --color-muted: #64748b;
     --color-border: #e2e8f0;
     --color-paper: #ffffff;
-    --color-primary: #B8860B;
-    --color-primary-hover: #996F09;
-    --color-accent: #D4AF37;
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-accent: #3b82f6;
   }
 
   .dark {
     --color-background: #0f172a;
-    --color-text: #f8fafc;
+    --color-text: #f1f5f9;
     --color-muted: #94a3b8;
     --color-border: #334155;
     --color-paper: #1e293b;
-    --color-primary: #D4AF37;
-    --color-primary-hover: #E5C158;
-    --color-accent: #F5D77A;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #60a5fa;
+    --color-accent: #60a5fa;
   }
 
   body {
@@ -39,9 +39,9 @@
     @apply font-serif font-bold tracking-tight;
   }
 
-  /* Dark Mode Text Enhancement */
+  /* Dark Mode Text */
   .dark .text-foreground {
-    color: #f8fafc !important;
+    color: #e2e8f0 !important;
   }
 
   .dark .text-muted {
@@ -81,80 +81,71 @@
   }
 }
 
-/* Dark Mode Card Styling */
+/* Dark Mode Cards - Softer Colors */
 .dark .bg-paper {
   background-color: #1e293b !important;
 }
 
 .dark .bg-zinc-900 {
-  background-color: #18212f !important;
+  background-color: #1a2332 !important;
 }
 
-/* Professional Dark Mode - Article Cards */
+/* Dark mode article cards */
 .dark .group:hover h3 {
-  color: #D4AF37 !important;
+  color: #60a5fa !important;
 }
 
 /* Dark mode borders */
 .dark .border-black\/5,
 .dark .border-black\/10 {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
-/* Dark mode hover states */
-.dark .hover\:border-black\/20:hover {
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-/* Improved contrast for dark mode text */
-.dark p,
-.dark span:not(.text-primary):not(.bg-primary) {
-  color: #cbd5e1;
+/* Softer text in dark mode */
+.dark p:not(.font-bold),
+.dark span:not(.text-primary):not(.bg-primary):not(.font-bold) {
+  color: #94a3b8;
 }
 
 .dark h1,
 .dark h2,
 .dark h3,
-.dark h4,
-.dark h5,
-.dark h6 {
-  color: #f1f5f9 !important;
+.dark h4 {
+  color: #e2e8f0 !important;
 }
 
-/* Better button visibility in dark mode */
+/* Professional Blue Buttons */
 .dark .bg-primary {
-  background-color: #D4AF37 !important;
+  background-color: #3b82f6 !important;
 }
 
 .dark .bg-primary:hover {
-  background-color: #E5C158 !important;
+  background-color: #60a5fa !important;
 }
 
-/* Footer specific styling */
+.dark .text-primary {
+  color: #60a5fa !important;
+}
+
+/* Footer */
 .dark .footer {
   background-color: #020617 !important;
 }
 
-/* Newsletter input in dark mode */
+/* Inputs */
 .dark input[type="email"],
 .dark input[type="text"],
 .dark input[type="password"] {
   background-color: #1e293b;
   border-color: #475569;
-  color: #f1f5f9;
+  color: #e2e8f0;
 }
 
 .dark input::placeholder {
   color: #64748b;
 }
 
-/* Category badges */
+/* Category badges soft */
 .dark .bg-primary\/10 {
-  background-color: rgba(212, 175, 55, 0.15) !important;
-}
-
-/* Smooth transitions */
-* {
-  transition-property: color, background-color, border-color;
-  transition-duration: 150ms;
+  background-color: rgba(59, 130, 246, 0.15) !important;
 }

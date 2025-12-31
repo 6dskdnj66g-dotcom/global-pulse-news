@@ -1,91 +1,116 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { Send, Mail, CheckCircle } from 'lucide-react';
 
 const Footer: React.FC = () => {
-    const { t, i18n } = useTranslation();
+    const { i18n } = useTranslation();
     const currentYear = new Date().getFullYear();
     const isRtl = i18n.language === 'ar';
+
+    const [email, setEmail] = useState('');
+    const [message, setMessage] = useState('');
+    const [sent, setSent] = useState(false);
 
     // Footer links with actual working routes
     const footerSections = [
         {
-            title: 'news',
+            title: 'NEWS',
             titleAr: 'الأخبار',
             links: [
-                { name: 'politics', nameAr: 'سياسة', path: '/category/politics' },
-                { name: 'economy', nameAr: 'اقتصاد', path: '/category/economy' },
-                { name: 'technology', nameAr: 'تكنولوجيا', path: '/category/technology' },
-                { name: 'sports', nameAr: 'رياضة', path: '/category/sports' },
+                { name: 'Politics', nameAr: 'سياسة', path: '/category/politics' },
+                { name: 'Economy', nameAr: 'اقتصاد', path: '/category/economy' },
+                { name: 'Technology', nameAr: 'تكنولوجيا', path: '/category/technology' },
+                { name: 'Sports', nameAr: 'رياضة', path: '/category/sports' },
             ]
         },
         {
-            title: 'categories',
-            titleAr: 'الأقسام',
-            links: [
-                { name: 'Breaking', nameAr: 'عاجل', path: '/' },
-                { name: 'World', nameAr: 'عالمي', path: '/category/politics' },
-                { name: 'Business', nameAr: 'أعمال', path: '/category/economy' },
-                { name: 'Tech', nameAr: 'تقنية', path: '/category/technology' },
-            ]
-        },
-        {
-            title: 'account',
+            title: 'ACCOUNT',
             titleAr: 'الحساب',
             links: [
                 { name: 'Sign In', nameAr: 'تسجيل الدخول', path: '/login' },
                 { name: 'Sign Up', nameAr: 'إنشاء حساب', path: '/signup' },
-                { name: 'Bookmarks', nameAr: 'المحفوظات', path: '/' },
-            ]
-        },
-        {
-            title: 'about',
-            titleAr: 'حول',
-            links: [
-                { name: 'About Us', nameAr: 'من نحن', path: '/' },
-                { name: 'Contact', nameAr: 'تواصل', path: '/' },
-                { name: 'Advertise', nameAr: 'إعلانات', path: '/' },
+                { name: 'Home', nameAr: 'الرئيسية', path: '/' },
             ]
         }
     ];
 
+    const handleContact = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Open email client with pre-filled message
+        const mailtoLink = `mailto:contact@globalpulse.news?subject=Contact from Global Pulse&body=${encodeURIComponent(message)}%0A%0AFrom: ${encodeURIComponent(email)}`;
+        window.open(mailtoLink, '_blank');
+        setSent(true);
+        setTimeout(() => setSent(false), 3000);
+        setEmail('');
+        setMessage('');
+    };
+
     return (
-        <footer className="footer bg-slate-900 dark:bg-slate-950 text-white border-t border-slate-700 pt-12 pb-6 mt-auto">
+        <footer className="footer bg-slate-900 dark:bg-slate-950 text-white border-t border-slate-700 pt-12 pb-8 mt-auto">
             <div className="container px-4">
-                {/* Newsletter Signup */}
-                <div className={`border-b border-slate-700 pb-12 mb-12 flex flex-col md:flex-row items-center justify-between gap-8 ${isRtl ? 'md:flex-row-reverse text-right' : 'md:flex-row text-left'}`}>
-                    <div className="text-center md:text-left">
-                        <h3 className="font-serif font-bold text-2xl mb-2 text-white">{t('footer.newsletter_title')}</h3>
-                        <p className="text-sm text-slate-400">{t('footer.newsletter_desc')}</p>
-                    </div>
-                    <div className={`flex w-full md:w-auto gap-2 ${isRtl ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <input
-                            type="email"
-                            placeholder={t('footer.newsletter_placeholder')}
-                            className={`bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 w-full md:w-64 rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary ${isRtl ? 'text-right' : 'text-left'}`}
-                        />
-                        <button className="bg-primary hover:bg-primary-hover text-white px-6 py-3 font-bold text-sm uppercase tracking-widest transition-all duration-300 rounded-lg whitespace-nowrap hover:scale-105">
-                            {t('footer.subscribe')}
-                        </button>
+
+                {/* Contact Section */}
+                <div className={`border-b border-slate-700 pb-12 mb-12 ${isRtl ? 'text-right' : 'text-left'}`}>
+                    <div className="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 className="font-serif font-bold text-2xl mb-2 text-white flex items-center gap-2">
+                                <Mail className="text-blue-400" size={24} />
+                                {isRtl ? 'تواصل معنا' : 'Contact Us'}
+                            </h3>
+                            <p className="text-sm text-slate-400">
+                                {isRtl ? 'أرسل لنا رسالتك وسنرد في أقرب وقت' : 'Send us a message and we\'ll respond shortly'}
+                            </p>
+                        </div>
+                        <form onSubmit={handleContact} className="flex flex-col gap-3">
+                            <input
+                                type="email"
+                                required
+                                placeholder={isRtl ? 'بريدك الإلكتروني' : 'Your email'}
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className={`bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${isRtl ? 'text-right' : 'text-left'}`}
+                            />
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    required
+                                    placeholder={isRtl ? 'رسالتك' : 'Your message'}
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    className={`bg-slate-800 border border-slate-600 text-white placeholder-slate-400 px-4 py-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1 ${isRtl ? 'text-right' : 'text-left'}`}
+                                />
+                                <button
+                                    type="submit"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 flex items-center gap-2"
+                                >
+                                    {sent ? <CheckCircle size={20} /> : <Send size={20} />}
+                                    {sent ? (isRtl ? 'تم!' : 'Sent!') : (isRtl ? 'إرسال' : 'Send')}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
                 {/* Footer Links Grid */}
-                <div className={`grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12 ${isRtl ? 'text-right' : 'text-left'}`}>
+                <div className={`grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 ${isRtl ? 'text-right' : 'text-left'}`}>
                     {/* Logo Section */}
-                    <div className="col-span-2 lg:col-span-1">
-                        <Link to="/" className="font-serif font-black text-3xl mb-4 block text-white hover:text-primary transition-colors">
-                            {t('app.title')}
+                    <div className="col-span-2">
+                        <Link to="/" className="font-serif font-black text-3xl mb-4 block text-white hover:text-blue-400 transition-colors">
+                            Global Pulse
                         </Link>
-                        <p className="text-sm text-slate-400 leading-relaxed max-w-xs font-serif italic">
-                            {t('footer.motto')}
+                        <p className="text-sm text-slate-400 leading-relaxed max-w-sm font-serif italic mb-4">
+                            {isRtl ? 'مصدرك اليومي للأخبار العالمية من مصادر موثوقة' : 'Your daily source for global news from trusted sources'}
                         </p>
+                        <div className="text-xs text-slate-500">
+                            BBC • Reuters • Al Jazeera • ESPN • TechCrunch • The Guardian
+                        </div>
                     </div>
 
                     {/* Dynamic Footer Sections */}
                     {footerSections.map((section) => (
                         <div key={section.title}>
-                            <h4 className="font-sans font-bold uppercase text-xs tracking-widest text-primary mb-4">
+                            <h4 className="font-sans font-bold uppercase text-xs tracking-widest text-blue-400 mb-4">
                                 {isRtl ? section.titleAr : section.title}
                             </h4>
                             <ul className="space-y-3">
@@ -104,25 +129,33 @@ const Footer: React.FC = () => {
                     ))}
                 </div>
 
-                {/* Bottom Bar */}
-                <div className={`border-t border-slate-700 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans uppercase tracking-widest text-slate-400 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
-                    <span>© {currentYear} GLOBAL PULSE MEDIA. ALL RIGHTS RESERVED.</span>
-
-                    {/* Designer Credit - 3D Effect */}
-                    <div className="flex items-center gap-2">
-                        <span
-                            className="text-sm font-black uppercase tracking-widest py-1 px-3 rounded-full"
+                {/* Designer Credit - BIG & PROMINENT */}
+                <div className="border-t border-slate-700 pt-8 mb-6">
+                    <div className="flex flex-col items-center justify-center mb-6">
+                        <span className="text-xs uppercase tracking-widest text-slate-500 mb-3">
+                            {isRtl ? 'تم التصميم والتطوير بواسطة' : 'Designed & Developed by'}
+                        </span>
+                        <div
+                            className="text-3xl md:text-4xl font-black uppercase tracking-wider py-3 px-8 rounded-2xl"
                             style={{
-                                background: 'linear-gradient(135deg, #D4AF37 0%, #F5D77A 50%, #B8860B 100%)',
+                                background: 'linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
-                                textShadow: '0 0 20px rgba(212,175,55,0.5)',
+                                textShadow: '0 0 40px rgba(59, 130, 246, 0.5)',
+                                letterSpacing: '0.1em'
                             }}
                         >
-                            ✨ DESIGNED BY HASANAIN SALAH ✨
-                        </span>
+                            ✨ HASANAIN SALAH ✨
+                        </div>
+                        <div className="text-sm text-slate-400 mt-2">
+                            Full-Stack Developer & UI/UX Designer
+                        </div>
                     </div>
+                </div>
 
+                {/* Copyright */}
+                <div className={`border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans uppercase tracking-widest text-slate-500 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
+                    <span>© {currentYear} GLOBAL PULSE MEDIA. ALL RIGHTS RESERVED.</span>
                     <div className="flex gap-6">
                         <Link to="/" className="hover:text-white transition-colors">PRIVACY</Link>
                         <Link to="/" className="hover:text-white transition-colors">TERMS</Link>

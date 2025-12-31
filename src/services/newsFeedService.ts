@@ -32,21 +32,56 @@ const CATEGORY_IMAGES: Record<string, string[]> = {
     ]
 };
 
-// === EXPANDED FEEDS ===
+// === EXPANDED GLOBAL NEWS SOURCES ===
 const ALL_FEEDS = [
+    // ===== INTERNATIONAL ENGLISH =====
     { name: 'BBC World', url: 'http://feeds.bbci.co.uk/news/world/rss.xml', category: 'Politics' },
+    { name: 'BBC Business', url: 'http://feeds.bbci.co.uk/news/business/rss.xml', category: 'Economy' },
+    { name: 'BBC Tech', url: 'http://feeds.bbci.co.uk/news/technology/rss.xml', category: 'Technology' },
+    { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss', category: 'Politics' },
+    { name: 'Reuters Top', url: 'https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best', category: 'Economy' },
     { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'Politics' },
-    { name: 'Reuters Business', url: 'https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best', category: 'Economy' },
+    { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml', category: 'Politics' },
+
+    // ===== TECHNOLOGY =====
     { name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Technology' },
+    { name: 'The Verge', url: 'https://www.theverge.com/rss/index.xml', category: 'Technology' },
+    { name: 'Wired', url: 'https://www.wired.com/feed/rss', category: 'Technology' },
+    { name: 'Ars Technica', url: 'https://feeds.arstechnica.com/arstechnica/index', category: 'Technology' },
+
+    // ===== SPORTS =====
     { name: 'ESPN', url: 'https://www.espn.com/espn/rss/news', category: 'Sports' },
+    { name: 'BBC Sport', url: 'http://feeds.bbci.co.uk/sport/rss.xml', category: 'Sports' },
+    { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040', category: 'Sports' },
     { name: 'Marca (Spain)', url: 'https://e00-marca.uecdn.es/rss/portada.xml', category: 'Sports' },
-    { name: 'AS (Spain)', url: 'https://as.com/rss/tags/ultimas_noticias.xml', category: 'Sports' }
+    { name: 'AS (Spain)', url: 'https://as.com/rss/tags/ultimas_noticias.xml', category: 'Sports' },
+
+    // ===== ECONOMY =====
+    { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', category: 'Economy' },
+    { name: 'Financial Times', url: 'https://www.ft.com/world?format=rss', category: 'Economy' },
 ];
 
 const getProImage = (category: string, fallback?: string): string => {
     const images = CATEGORY_IMAGES[category] || CATEGORY_IMAGES['Technology'];
-    if (fallback && fallback.startsWith('http')) return fallback;
+    if (fallback && fallback.startsWith('http') && !fallback.includes('logo') && !fallback.includes('icon')) {
+        return fallback;
+    }
     return images[Math.floor(Math.random() * images.length)];
+};
+
+// Format real publish time
+const formatRealTime = (pubDate: string): string => {
+    const date = new Date(pubDate);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 };
 
 // === FETCH SINGLE REAL NEWS ===
@@ -58,98 +93,89 @@ export const fetchRealNews = async (): Promise<Article | null> => {
 
         if (data.status === 'ok' && data.items?.length > 0) {
             const item = data.items[Math.floor(Math.random() * data.items.length)];
-            const plainExcerpt = item.description?.replace(/<[^>]+>/g, '').substring(0, 150) + '...';
-
             return {
-                id: `real-${Date.now()}-${Math.random()}`,
-                title: item.title,
-                excerpt: plainExcerpt || 'Click to read full story from the source.',
-                category: feed.category as any,
-                imageUrl: getProImage(feed.category, item.enclosure?.link || item.thumbnail),
-                date: new Date().toISOString().split('T')[0],
-                author: item.author || feed.name,
+                id: `rss-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                title: item.title?.replace(/<[^>]*>/g, '') || 'Breaking News',
+                excerpt: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...' || 'Latest update from trusted sources.',
+                imageUrl: getProImage(feed.category, item.thumbnail || item.enclosure?.link),
+                category: feed.category,
+                author: feed.name,
+                date: formatRealTime(item.pubDate),
+                isBreaking: true,
                 source: feed.name,
-                sourceUrl: item.link,
-                isBreaking: Math.random() > 0.8
+                sourceUrl: item.link || '#'
             };
         }
-        return null;
     } catch (error) {
-        return null;
+        console.error('RSS Fetch Error:', error);
     }
+    return null;
 };
 
-// === FETCH BATCH REAL NEWS (FOR INSTANT LOAD) ===
-export const fetchBatchRealNews = async (count: number = 8): Promise<Article[]> => {
-    const articles: Article[] = [];
-    const shuffledFeeds = [...ALL_FEEDS].sort(() => 0.5 - Math.random()).slice(0, 6); // Pick 6 random feeds to query
-
-    const promises = shuffledFeeds.map(async (feed) => {
-        try {
-            const response = await fetch(`${RSS_TO_JSON}${encodeURIComponent(feed.url)}`);
-            const data = await response.json();
-            if (data.status === 'ok' && data.items?.length > 0) {
-                // Get top 2 items from this feed
-                return data.items.slice(0, 2).map((item: any) => ({
-                    id: `batch-${Date.now()}-${Math.random()}`,
-                    title: item.title,
-                    excerpt: (item.description?.replace(/<[^>]+>/g, '').substring(0, 140) + '...') || 'Latest update from global wires.',
-                    category: feed.category as any,
-                    imageUrl: getProImage(feed.category, item.enclosure?.link || item.thumbnail),
-                    date: new Date().toISOString().split('T')[0],
-                    author: item.author || feed.name,
-                    source: feed.name,
-                    sourceUrl: item.link,
-                    isBreaking: false
-                }));
-            }
-        } catch (e) {
-            return [];
-        }
-        return [];
-    });
-
-    const results = await Promise.all(promises);
-    results.forEach(batch => {
-        if (batch) articles.push(...batch);
-    });
-
-    return articles.sort(() => 0.5 - Math.random()).slice(0, count);
-};
-
+// === Fetch news by category ===
 export const fetchNewsByCategory = async (category: string): Promise<Article[]> => {
-    const categoryFeeds = ALL_FEEDS.filter(f => f.category.toLowerCase() === category.toLowerCase());
-    if (categoryFeeds.length === 0) return [];
-
     const articles: Article[] = [];
+    const categoryFeeds = ALL_FEEDS.filter(f => f.category.toLowerCase() === category.toLowerCase());
 
-    // Parallel fetch for speed
-    const promises = categoryFeeds.map(async (feed) => {
+    for (const feed of categoryFeeds.slice(0, 3)) {
         try {
             const response = await fetch(`${RSS_TO_JSON}${encodeURIComponent(feed.url)}`);
             const data = await response.json();
-            if (data.status === 'ok' && data.items?.length > 0) {
-                return data.items.slice(0, 4).map((item: any) => ({
-                    id: `cat-${Date.now()}-${Math.random()}`,
-                    title: item.title,
-                    excerpt: (item.description?.replace(/<[^>]+>/g, '').substring(0, 150) + '...') || 'Click to read full story.',
-                    category: feed.category as any,
-                    imageUrl: getProImage(feed.category, item.enclosure?.link || item.thumbnail),
-                    date: new Date().toISOString().split('T')[0],
-                    author: item.author || feed.name,
-                    source: feed.name,
-                    sourceUrl: item.link,
-                    isBreaking: false
-                }));
-            }
-        } catch (e) { return []; }
-        return [];
-    });
 
-    const results = await Promise.all(promises);
-    results.forEach(batch => {
-        if (batch) articles.push(...batch);
-    });
+            if (data.status === 'ok' && data.items?.length > 0) {
+                const items = data.items.slice(0, 4);
+                items.forEach((item: any, index: number) => {
+                    articles.push({
+                        id: `cat-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 5)}`,
+                        title: item.title?.replace(/<[^>]*>/g, '') || 'News Update',
+                        excerpt: item.description?.replace(/<[^>]*>/g, '').substring(0, 180) + '...' || 'Read more.',
+                        imageUrl: getProImage(feed.category, item.thumbnail || item.enclosure?.link),
+                        category: feed.category,
+                        author: feed.name,
+                        date: formatRealTime(item.pubDate),
+                        isBreaking: false,
+                        source: feed.name,
+                        sourceUrl: item.link || '#'
+                    });
+                });
+            }
+        } catch (error) {
+            console.error(`Error fetching ${feed.name}:`, error);
+        }
+    }
 
     return articles;
+};
+
+// === BATCH FETCH for fast loading ===
+export const fetchBatchRealNews = async (count: number = 12): Promise<Article[]> => {
+    const shuffledFeeds = [...ALL_FEEDS].sort(() => Math.random() - 0.5);
+
+    const fetchPromises = shuffledFeeds.slice(0, Math.min(count, shuffledFeeds.length)).map(async (feed) => {
+        try {
+            const response = await fetch(`${RSS_TO_JSON}${encodeURIComponent(feed.url)}`);
+            const data = await response.json();
+
+            if (data.status === 'ok' && data.items?.length > 0) {
+                const item = data.items[0];
+                return {
+                    id: `batch-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    title: item.title?.replace(/<[^>]*>/g, '') || 'Latest News',
+                    excerpt: item.description?.replace(/<[^>]*>/g, '').substring(0, 200) + '...' || 'Breaking update.',
+                    imageUrl: getProImage(feed.category, item.thumbnail || item.enclosure?.link),
+                    category: feed.category,
+                    author: feed.name,
+                    date: formatRealTime(item.pubDate),
+                    isBreaking: Math.random() > 0.7,
+                    source: feed.name,
+                    sourceUrl: item.link || '#'
+                };
+            }
+        } catch {
+            return null;
+        }
+    });
+
+    const results = await Promise.all(fetchPromises);
+    return results.filter(a => a !== null && a !== undefined) as Article[];
 };
