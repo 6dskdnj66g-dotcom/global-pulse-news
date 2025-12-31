@@ -34,12 +34,11 @@ export const signInWithGoogle = async () => {
         const result = await signInWithPopup(auth, googleProvider);
         const user = result.user;
 
-        // Try to save to Firestore, but don't block login if it fails (e.g. permission issues)
-        try {
-            await saveUserToFirestore(user);
-        } catch (dbError) {
-            console.warn('Firestore write failed (likely permission issues), but Auth successful:', dbError);
-        }
+        // FAST OPTIMIZATION: Fire and forget Firestore write
+        // Do not await this promise so the UI updates immediately
+        saveUserToFirestore(user).catch(err =>
+            console.warn('Firestore write warning:', err)
+        );
 
         return { success: true, user };
     } catch (error: any) {

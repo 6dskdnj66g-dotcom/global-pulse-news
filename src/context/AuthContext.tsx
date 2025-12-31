@@ -47,7 +47,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const login = async (email: string, password: string) => {
         try {
             const result = await signInWithEmailAndPassword(auth, email, password);
-            await saveUserToFirestore(result.user);
+            // Fire and forget - Don't block UI
+            saveUserToFirestore(result.user).catch(console.warn);
             return { success: true };
         } catch (error: any) {
             console.error('Login error:', error);
@@ -60,7 +61,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const result = await createUserWithEmailAndPassword(auth, email, password);
             // Update display name
             await updateProfile(result.user, { displayName: name });
-            await saveUserToFirestore(result.user);
+            // Fire and forget - Don't block UI
+            saveUserToFirestore(result.user).catch(console.warn);
             return { success: true };
         } catch (error: any) {
             console.error('Signup error:', error);
