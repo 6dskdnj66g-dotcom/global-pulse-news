@@ -8,6 +8,7 @@ import { fetchBreakingNews } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
+import { SkeletonGrid, SkeletonHero } from '../components/common/SkeletonCard';
 
 const Home: React.FC = () => {
     const { t } = useTranslation();
@@ -62,8 +63,18 @@ const Home: React.FC = () => {
         return (
             <Layout>
                 <SEO title={t('common.loading')} />
-                <div className="flex justify-center items-center min-h-screen bg-background">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <div className="container py-8 space-y-8">
+                    {/* Skeleton Ticker */}
+                    <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
+
+                    {/* Skeleton Hero */}
+                    <SkeletonHero />
+
+                    {/* Skeleton Grid */}
+                    <div className="mt-8">
+                        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-6 animate-pulse" />
+                        <SkeletonGrid count={6} />
+                    </div>
                 </div>
             </Layout>
         );
