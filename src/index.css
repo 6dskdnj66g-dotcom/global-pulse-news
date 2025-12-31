@@ -16,17 +16,11 @@
 
   .dark {
     --color-background: #0f172a;
-    /* Improved: Slate 900 instead of 950 for better readability */
-    --color-text: #f1f5f9;
-    /* Brighter text for better contrast */
-    --color-muted: #cbd5e1;
-    /* Lighter muted color for visibility */
+    --color-text: #f8fafc;
+    --color-muted: #94a3b8;
     --color-border: #334155;
-    /* More visible borders */
     --color-paper: #1e293b;
-    /* Card backgrounds */
     --color-primary: #D4AF37;
-    /* Brighter gold in dark mode */
     --color-primary-hover: #E5C158;
     --color-accent: #F5D77A;
   }
@@ -45,24 +39,13 @@
     @apply font-serif font-bold tracking-tight;
   }
 
-  /* Improved Dark Mode Text Visibility */
-  .dark p,
-  .dark span,
-  .dark li {
-    color: #e2e8f0;
+  /* Dark Mode Text Enhancement */
+  .dark .text-foreground {
+    color: #f8fafc !important;
   }
 
   .dark .text-muted {
     color: #94a3b8 !important;
-  }
-
-  /* Better link visibility in dark mode */
-  .dark a:not(.bg-primary) {
-    color: inherit;
-  }
-
-  .dark a:hover {
-    color: var(--color-accent);
   }
 }
 
@@ -83,7 +66,7 @@
   @apply bg-slate-400 dark:bg-slate-500;
 }
 
-/* Clean up 3D utilities */
+/* 3D Utilities */
 @layer utilities {
   .perspective-1000 {
     perspective: 1000px;
@@ -98,15 +81,80 @@
   }
 }
 
-/* Dark Mode Card Improvements */
+/* Dark Mode Card Styling */
 .dark .bg-paper {
-  background-color: #1e293b;
+  background-color: #1e293b !important;
 }
 
-.dark .border-black\/5 {
-  border-color: rgba(255, 255, 255, 0.1);
+.dark .bg-zinc-900 {
+  background-color: #18212f !important;
 }
 
+/* Professional Dark Mode - Article Cards */
+.dark .group:hover h3 {
+  color: #D4AF37 !important;
+}
+
+/* Dark mode borders */
+.dark .border-black\/5,
 .dark .border-black\/10 {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Dark mode hover states */
+.dark .hover\:border-black\/20:hover {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Improved contrast for dark mode text */
+.dark p,
+.dark span:not(.text-primary):not(.bg-primary) {
+  color: #cbd5e1;
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #f1f5f9 !important;
+}
+
+/* Better button visibility in dark mode */
+.dark .bg-primary {
+  background-color: #D4AF37 !important;
+}
+
+.dark .bg-primary:hover {
+  background-color: #E5C158 !important;
+}
+
+/* Footer specific styling */
+.dark .footer {
+  background-color: #020617 !important;
+}
+
+/* Newsletter input in dark mode */
+.dark input[type="email"],
+.dark input[type="text"],
+.dark input[type="password"] {
+  background-color: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+.dark input::placeholder {
+  color: #64748b;
+}
+
+/* Category badges */
+.dark .bg-primary\/10 {
+  background-color: rgba(212, 175, 55, 0.15) !important;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: color, background-color, border-color;
+  transition-duration: 150ms;
 }
