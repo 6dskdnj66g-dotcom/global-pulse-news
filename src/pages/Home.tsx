@@ -53,7 +53,7 @@ const Home: React.FC = () => {
                     return prev;
                 });
             }
-        }, 20000); // Every 20 seconds
+        }, 10000); // Every 10 seconds for faster updates
 
         return () => clearInterval(interval);
     }, []);

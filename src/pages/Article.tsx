@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { mockArticles, Article } from '../data/mockData';
-import { Calendar, User, Clock, Share2, ArrowRight, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Calendar, User, Clock, Share2, ArrowRight, ArrowLeft, ExternalLink, Newspaper, TrendingUp, Globe } from 'lucide-react';
 import SEO from '../components/common/SEO';
 import { useTranslation } from 'react-i18next';
 import NewsCard from '../components/news/NewsCard';
@@ -13,8 +13,6 @@ const ArticlePage: React.FC = () => {
     const location = useLocation();
     const isRtl = i18n.language === 'ar';
 
-    // Try to get article from navigation state (for real RSS articles)
-    // Fallback to mockArticles for static articles
     const stateArticle = (location.state as { article?: Article })?.article;
     const article = stateArticle || mockArticles.find(a => a.id === id);
 
@@ -34,6 +32,42 @@ const ArticlePage: React.FC = () => {
 
     const isExternalArticle = article.sourceUrl && article.sourceUrl !== '#' && article.sourceUrl.startsWith('http');
 
+    // Generate expanded summary based on excerpt
+    const generateExpandedSummary = (excerpt: string): string[] => {
+        const basePoints = [
+            excerpt,
+        ];
+
+        // Add category-specific context
+        const categoryContext: Record<string, string[]> = {
+            'Politics': [
+                isRtl ? 'يأتي هذا التطور في سياق التحولات الجيوسياسية العالمية المتسارعة.' : 'This development comes amid rapid global geopolitical shifts.',
+                isRtl ? 'المحللون يتوقعون تأثيرات واسعة على العلاقات الدولية.' : 'Analysts expect wide-ranging impacts on international relations.'
+            ],
+            'Economy': [
+                isRtl ? 'الأسواق المالية تتفاعل مع هذه التطورات بحذر.' : 'Financial markets are reacting cautiously to these developments.',
+                isRtl ? 'الخبراء ينصحون المستثمرين بمتابعة المؤشرات الاقتصادية عن كثب.' : 'Experts advise investors to monitor economic indicators closely.'
+            ],
+            'Technology': [
+                isRtl ? 'هذا التطور يمثل نقلة نوعية في عالم التكنولوجيا.' : 'This development represents a paradigm shift in technology.',
+                isRtl ? 'الشركات التقنية الكبرى تتسابق للاستفادة من هذا التحول.' : 'Major tech companies are racing to capitalize on this shift.'
+            ],
+            'Sports': [
+                isRtl ? 'المشجعون حول العالم يتابعون هذا الحدث باهتمام كبير.' : 'Fans around the world are following this event with great interest.',
+                isRtl ? 'هذه النتيجة قد تغير مسار الموسم الرياضي بالكامل.' : 'This result could change the course of the entire sports season.'
+            ],
+            'Culture': [
+                isRtl ? 'الحدث يعكس التحولات الثقافية في المجتمع المعاصر.' : 'The event reflects cultural shifts in contemporary society.',
+                isRtl ? 'النقاد يرون في هذا التطور علامة على تغير الذوق العام.' : 'Critics see this development as a sign of changing public taste.'
+            ]
+        };
+
+        const context = categoryContext[article.category] || categoryContext['Technology'];
+        return [...basePoints, ...context];
+    };
+
+    const summaryPoints = generateExpandedSummary(article.excerpt);
+
     const relatedArticles = mockArticles
         .filter(a => a.category === article.category && a.id !== article.id)
         .slice(0, 4);
@@ -45,6 +79,7 @@ const ArticlePage: React.FC = () => {
                 description={article.excerpt}
                 image={article.imageUrl}
                 type="article"
+                keywords={`${article.category}, ${article.source || 'Global Pulse'}, أخبار, news`}
             />
             <article className={`container px-4 pb-16 animate-fade-in ${isRtl ? 'text-right' : 'text-left'}`}>
                 {/* Article Header */}
@@ -54,8 +89,14 @@ const ArticlePage: React.FC = () => {
                             {t(`nav.${article.category.toLowerCase()}`)}
                         </span>
                         {article.source && (
-                            <span className="text-xs bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full font-medium">
-                                Via {article.source}
+                            <span className="text-xs bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                                <Globe size={12} />
+                                {article.source}
+                            </span>
+                        )}
+                        {article.isBreaking && (
+                            <span className="text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold animate-pulse">
+                                {isRtl ? 'عاجل' : 'BREAKING'}
                             </span>
                         )}
                     </div>
@@ -91,14 +132,52 @@ const ArticlePage: React.FC = () => {
 
                 {/* Article Summary & Content */}
                 <div className="max-w-3xl mx-auto">
-                    {/* Executive Summary */}
-                    <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-6 md:p-8 mb-10">
-                        <h2 className="text-lg font-bold uppercase tracking-widest text-primary mb-4 flex items-center gap-2">
-                            📋 {isRtl ? 'ملخص الخبر' : 'Executive Summary'}
-                        </h2>
-                        <p className="text-xl md:text-2xl leading-relaxed text-slate-800 dark:text-slate-200 font-serif">
-                            {article.excerpt}
-                        </p>
+
+                    {/* ENHANCED Executive Summary */}
+                    <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/80 dark:to-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 md:p-8 mb-10 shadow-lg">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="bg-primary/20 p-3 rounded-xl">
+                                <Newspaper className="text-primary" size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-primary">
+                                    {isRtl ? 'ملخص شامل للخبر' : 'Comprehensive Summary'}
+                                </h2>
+                                <p className="text-xs text-slate-500 uppercase tracking-widest">
+                                    {isRtl ? 'نظرة سريعة على أهم النقاط' : 'Quick overview of key points'}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Main Summary */}
+                        <div className="space-y-4">
+                            {summaryPoints.map((point, index) => (
+                                <div key={index} className={`flex gap-3 ${index === 0 ? 'text-xl md:text-2xl font-serif leading-relaxed text-slate-800 dark:text-slate-200' : 'text-base text-slate-600 dark:text-slate-400'}`}>
+                                    {index > 0 && (
+                                        <span className="text-primary mt-1">
+                                            <TrendingUp size={16} />
+                                        </span>
+                                    )}
+                                    <p>{point}</p>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Quick Facts */}
+                        <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                <p className="text-2xl font-bold text-primary">{article.category}</p>
+                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'القسم' : 'Category'}</p>
+                            </div>
+                            <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                                <p className="text-2xl font-bold text-primary">{article.source || 'Global Pulse'}</p>
+                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'المصدر' : 'Source'}</p>
+                            </div>
+                            <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg col-span-2 md:col-span-1">
+                                <p className="text-2xl font-bold text-primary">{article.date}</p>
+                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'التاريخ' : 'Date'}</p>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Full Article Content (if available) */}
@@ -113,23 +192,31 @@ const ArticlePage: React.FC = () => {
 
                     {/* Read Full Article Button (for external sources) */}
                     {isExternalArticle && (
-                        <div className="bg-primary/5 border-2 border-primary/20 rounded-xl p-6 md:p-8 text-center mb-10">
-                            <p className="text-slate-600 dark:text-slate-400 mb-4 font-medium">
+                        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border-2 border-primary/30 rounded-2xl p-6 md:p-8 text-center mb-10">
+                            <div className="flex justify-center mb-4">
+                                <div className="bg-primary/20 p-4 rounded-full">
+                                    <ExternalLink className="text-primary" size={32} />
+                                </div>
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">
+                                {isRtl ? 'للقراءة الكاملة والتفصيلية' : 'For Full Coverage'}
+                            </h3>
+                            <p className="text-slate-600 dark:text-slate-400 mb-6">
                                 {isRtl
-                                    ? `للقراءة الكاملة للمقال من المصدر الأصلي (${article.source}):`
-                                    : `Read the full article from ${article.source}:`
+                                    ? `اقرأ المقال الكامل من المصدر الأصلي: ${article.source}`
+                                    : `Read the complete article from the original source: ${article.source}`
                                 }
                             </p>
                             <a
                                 href={article.sourceUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-3 bg-primary hover:bg-primary-hover text-white font-bold px-8 py-4 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                                className="inline-flex items-center gap-3 bg-primary hover:bg-primary-hover text-white font-bold px-10 py-5 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
                             >
-                                <ExternalLink size={20} />
+                                <Newspaper size={22} />
                                 {isRtl ? 'قراءة المقال الكامل' : 'Read Full Article'}
-                                {!isRtl && <ArrowRight size={20} />}
-                                {isRtl && <ArrowLeft size={20} />}
+                                {!isRtl && <ArrowRight size={22} />}
+                                {isRtl && <ArrowLeft size={22} />}
                             </a>
                         </div>
                     )}
