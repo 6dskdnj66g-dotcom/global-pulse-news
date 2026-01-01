@@ -57,5 +57,42 @@
         "name_placeholder": "Full Name",
         "submit_signin": "Sign in",
         "submit_signup": "Create Account"
+    },
+    "home": {
+        "opinion_title": "Opinion & Commentary",
+        "columnist_name": "Columnist Name",
+        "markets_ticker": "📈 MARKETS: "
+    },
+    "article": {
+        "summary_title": "Comprehensive Summary",
+        "summary_subtitle": "Quick overview of key points",
+        "category_label": "Category",
+        "source_label": "Source",
+        "date_label": "Date",
+        "external_link_title": "For Full Coverage",
+        "read_full": "Read Full Article",
+        "copied": "Link copied!",
+        "context": {
+            "politics": [
+                "This development comes amid rapid global geopolitical shifts.",
+                "Analysts expect wide-ranging impacts on international relations."
+            ],
+            "economy": [
+                "Financial markets are reacting cautiously to these developments.",
+                "Experts advise investors to monitor economic indicators closely."
+            ],
+            "technology": [
+                "This development represents a paradigm shift in technology.",
+                "Major tech companies are racing to capitalize on this shift."
+            ],
+            "sports": [
+                "Fans around the world are following this event with great interest.",
+                "This result could change the course of the entire sports season."
+            ],
+            "culture": [
+                "The event reflects cultural shifts in contemporary society.",
+                "Critics see this development as a sign of changing public taste."
+            ]
+        }
     }
 }

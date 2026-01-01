@@ -38,32 +38,17 @@ const ArticlePage: React.FC = () => {
             excerpt,
         ];
 
-        // Add category-specific context
-        const categoryContext: Record<string, string[]> = {
-            'Politics': [
-                isRtl ? 'يأتي هذا التطور في سياق التحولات الجيوسياسية العالمية المتسارعة.' : 'This development comes amid rapid global geopolitical shifts.',
-                isRtl ? 'المحللون يتوقعون تأثيرات واسعة على العلاقات الدولية.' : 'Analysts expect wide-ranging impacts on international relations.'
-            ],
-            'Economy': [
-                isRtl ? 'الأسواق المالية تتفاعل مع هذه التطورات بحذر.' : 'Financial markets are reacting cautiously to these developments.',
-                isRtl ? 'الخبراء ينصحون المستثمرين بمتابعة المؤشرات الاقتصادية عن كثب.' : 'Experts advise investors to monitor economic indicators closely.'
-            ],
-            'Technology': [
-                isRtl ? 'هذا التطور يمثل نقلة نوعية في عالم التكنولوجيا.' : 'This development represents a paradigm shift in technology.',
-                isRtl ? 'الشركات التقنية الكبرى تتسابق للاستفادة من هذا التحول.' : 'Major tech companies are racing to capitalize on this shift.'
-            ],
-            'Sports': [
-                isRtl ? 'المشجعون حول العالم يتابعون هذا الحدث باهتمام كبير.' : 'Fans around the world are following this event with great interest.',
-                isRtl ? 'هذه النتيجة قد تغير مسار الموسم الرياضي بالكامل.' : 'This result could change the course of the entire sports season.'
-            ],
-            'Culture': [
-                isRtl ? 'الحدث يعكس التحولات الثقافية في المجتمع المعاصر.' : 'The event reflects cultural shifts in contemporary society.',
-                isRtl ? 'النقاد يرون في هذا التطور علامة على تغير الذوق العام.' : 'Critics see this development as a sign of changing public taste.'
-            ]
-        };
+        // Add category-specific context using translations
+        const categoryKey = article.category.toLowerCase() as 'politics' | 'economy' | 'technology' | 'sports' | 'culture';
+        // Fallback to technology if key doesn't exist (simplification)
+        const contextPoints = t(`article.context.${categoryKey}`, { returnObjects: true }) as string[];
 
-        const context = categoryContext[article.category] || categoryContext['Technology'];
-        return [...basePoints, ...context];
+        // Check if contextPoints is actually an array (it should be if key exists)
+        if (Array.isArray(contextPoints)) {
+            return [...basePoints, ...contextPoints];
+        }
+
+        return basePoints;
     };
 
     const summaryPoints = generateExpandedSummary(article.excerpt);
@@ -80,13 +65,19 @@ const ArticlePage: React.FC = () => {
                 image={article.imageUrl}
                 type="article"
                 keywords={`${article.category}, ${article.source || 'Global Pulse'}, أخبار, news`}
+                schemaType="article"
+                articleData={{
+                    publishedAt: article.date,
+                    author: article.author,
+                    modifiedAt: article.date
+                }}
             />
             <article className={`container px-4 pb-16 animate-fade-in ${isRtl ? 'text-right' : 'text-left'}`}>
                 {/* Article Header */}
                 <header className={`my-8 md:mb-12 max-w-4xl mx-auto ${isRtl ? 'md:text-right' : 'md:text-left'}`}>
                     <div className="flex items-center gap-3 flex-wrap mb-6">
                         <span className="text-primary font-bold uppercase tracking-wider text-sm bg-primary/10 px-3 py-1 rounded-full">
-                            {t(`nav.${article.category.toLowerCase()}`)}
+                            {t(`nav.${article.category.toLowerCase()}`, { defaultValue: article.category })}
                         </span>
                         {article.source && (
                             <span className="text-xs bg-slate-200 dark:bg-slate-700 px-3 py-1 rounded-full font-medium flex items-center gap-1">
@@ -96,7 +87,7 @@ const ArticlePage: React.FC = () => {
                         )}
                         {article.isBreaking && (
                             <span className="text-xs bg-red-500 text-white px-3 py-1 rounded-full font-bold animate-pulse">
-                                {isRtl ? 'عاجل' : 'BREAKING'}
+                                {t('common.breaking')}
                             </span>
                         )}
                     </div>
@@ -141,10 +132,10 @@ const ArticlePage: React.FC = () => {
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-primary">
-                                    {isRtl ? 'ملخص شامل للخبر' : 'Comprehensive Summary'}
+                                    {t('article.summary_title')}
                                 </h2>
                                 <p className="text-xs text-slate-500 uppercase tracking-widest">
-                                    {isRtl ? 'نظرة سريعة على أهم النقاط' : 'Quick overview of key points'}
+                                    {t('article.summary_subtitle')}
                                 </p>
                             </div>
                         </div>
@@ -166,16 +157,16 @@ const ArticlePage: React.FC = () => {
                         {/* Quick Facts */}
                         <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700 grid grid-cols-2 md:grid-cols-3 gap-4">
                             <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
-                                <p className="text-2xl font-bold text-primary">{article.category}</p>
-                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'القسم' : 'Category'}</p>
+                                <p className="text-2xl font-bold text-primary">{t(`nav.${article.category.toLowerCase()}`, { defaultValue: article.category })}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t('article.category_label')}</p>
                             </div>
                             <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg">
                                 <p className="text-2xl font-bold text-primary">{article.source || 'Global Pulse'}</p>
-                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'المصدر' : 'Source'}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t('article.source_label')}</p>
                             </div>
                             <div className="text-center p-3 bg-white/50 dark:bg-slate-800/50 rounded-lg col-span-2 md:col-span-1">
                                 <p className="text-2xl font-bold text-primary">{article.date}</p>
-                                <p className="text-xs text-slate-500 uppercase">{isRtl ? 'التاريخ' : 'Date'}</p>
+                                <p className="text-xs text-slate-500 uppercase">{t('article.date_label')}</p>
                             </div>
                         </div>
                     </div>
@@ -199,7 +190,7 @@ const ArticlePage: React.FC = () => {
                                 </div>
                             </div>
                             <h3 className="text-xl font-bold mb-2">
-                                {isRtl ? 'للقراءة الكاملة والتفصيلية' : 'For Full Coverage'}
+                                {t('article.external_link_title')}
                             </h3>
                             <p className="text-slate-600 dark:text-slate-400 mb-6">
                                 {isRtl
@@ -214,7 +205,7 @@ const ArticlePage: React.FC = () => {
                                 className="inline-flex items-center gap-3 bg-primary hover:bg-primary-hover text-white font-bold px-10 py-5 rounded-full text-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl"
                             >
                                 <Newspaper size={22} />
-                                {isRtl ? 'قراءة المقال الكامل' : 'Read Full Article'}
+                                {t('article.read_full')}
                                 {!isRtl && <ArrowRight size={22} />}
                                 {isRtl && <ArrowLeft size={22} />}
                             </a>
@@ -229,7 +220,7 @@ const ArticlePage: React.FC = () => {
                                 onClick={() => {
                                     const url = article.sourceUrl || window.location.href;
                                     navigator.clipboard.writeText(url);
-                                    alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                    alert(t('article.copied'));
                                 }}
                                 className="p-3 rounded-full border border-border hover:bg-primary hover:text-white hover:border-primary transition-all duration-300"
                             >

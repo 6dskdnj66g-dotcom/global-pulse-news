@@ -30,14 +30,15 @@ const Home: React.FC = () => {
             setArticles(realArticles);
 
             // Inject Market Data into Ticker
-            const marketData = "📈 MARKETS: BTC $93,000 ▲ | ETH $3,400 ▲ | OIL $78.20 ▼ | GOLD $2,050 ▲ | S&P 500 5,100 ▲";
+            const marketPrefix = t('home.markets_ticker');
+            const marketData = `${marketPrefix} BTC $93,000 ▲ | ETH $3,400 ▲ | OIL $78.20 ▼ | GOLD $2,050 ▲ | S&P 500 5,100 ▲`;
             setBreakingNews([marketData, ...tickerData]);
 
             setLoading(false);
         };
 
         loadData();
-    }, []);
+    }, [t]);
 
     // === PHASE 10: REAL-TIME UPDATES ===
     useEffect(() => {
@@ -104,12 +105,12 @@ const Home: React.FC = () => {
 
                 {/* Opinion Section */}
                 <div className="mt-16 pt-12 border-t-4 border-black dark:border-white">
-                    <h2 className="text-3xl font-serif font-black mb-8 text-center italic">Opinion & Commentary</h2>
+                    <h2 className="text-3xl font-serif font-black mb-8 text-center italic">{t('home.opinion_title')}</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                         {[1, 2, 3].map((i) => (
                             <div key={i} className="bg-paper dark:bg-white/5 p-6 border border-black/5">
                                 <div className="w-12 h-12 bg-black/10 rounded-full mx-auto mb-4" />
-                                <h4 className="font-sans font-bold text-xs uppercase tracking-widest text-primary-accent mb-2">Columnist Name</h4>
+                                <h4 className="font-sans font-bold text-xs uppercase tracking-widest text-primary-accent mb-2">{t('home.columnist_name')}</h4>
                                 <h3 className="font-serif text-xl font-bold leading-tight mb-3 hover:underline">The complex reality of global economic shifts requires new thinking.</h3>
                                 <p className="text-sm font-serif text-muted italic line-clamp-3">
                                     "In a world where digital borders are fading, we must reassess our traditional understanding of sovereignty..."

@@ -10,12 +10,14 @@ interface SEOProps {
     keywords?: string;
 }
 
-const SEO: React.FC<SEOProps> = ({
+const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData?: any }> = ({
     title,
     description,
     image = 'https://global-pulse-news.vercel.app/og-image.jpg',
     type = 'website',
-    keywords
+    keywords,
+    schemaType = 'website',
+    articleData
 }) => {
     const { t, i18n } = useTranslation();
 
@@ -29,6 +31,41 @@ const SEO: React.FC<SEOProps> = ({
     const defaultKeywords = 'النبض العالمي, Global Pulse, أخبار عالمية, أخبار حية, BBC Arabic, Reuters, Al Jazeera, news, breaking news, أخبار عاجلة, رياضة, اقتصاد, تكنولوجيا, سياسة';
     const metaKeywords = keywords || defaultKeywords;
 
+    // Base Schema (Organization)
+    const baseSchema = {
+        "@context": "https://schema.org",
+        "@type": "NewsMediaOrganization",
+        "name": "Global Pulse | النبض العالمي",
+        "alternateName": ["النبض العالمي", "Global Pulse", "نبض الحياة"],
+        "url": "https://global-pulse-news.vercel.app",
+        "logo": "https://global-pulse-news.vercel.app/logo.png",
+        "sameAs": [
+            "https://global-pulse-news.netlify.app",
+            "https://github.com/6dskdnj66g-dotcom/global-pulse-news"
+        ],
+        "description": "موقع إخباري عالمي يقدم آخر الأخبار من مصادر موثوقة - Global news aggregator"
+    };
+
+    // Article Schema (if applicable)
+    let schemaJSON = baseSchema;
+    if (schemaType === 'article' && articleData) {
+        schemaJSON = {
+            "@context": "https://schema.org",
+            "@type": "NewsArticle",
+            "headline": title?.substring(0, 110),
+            "image": [image],
+            "datePublished": articleData.publishedAt || new Date().toISOString(),
+            "dateModified": articleData.publishedAt || new Date().toISOString(),
+            "author": [{
+                "@type": "Person",
+                "name": articleData.author || "Global Pulse Team",
+                "url": "https://global-pulse-news.vercel.app"
+            }],
+            "publisher": baseSchema,
+            "description": metaDescription
+        } as any;
+    }
+
     return (
         <Helmet>
             {/* Basic */}
@@ -37,7 +74,8 @@ const SEO: React.FC<SEOProps> = ({
             <meta name="description" content={metaDescription} />
             <meta name="keywords" content={metaKeywords} />
             <meta name="author" content="Global Pulse Team" />
-            <meta name="robots" content="index, follow" />
+            <meta name="robots" content="index, follow, max-image-preview:large" />
+            <meta name="google-site-verification" content="ua0y5G-swG0kpNv8fM8BRysjY2CHdpsYsOVcN12RG5c" />
 
             {/* Canonical URL */}
             <link rel="canonical" href="https://global-pulse-news.vercel.app" />
@@ -64,19 +102,7 @@ const SEO: React.FC<SEOProps> = ({
 
             {/* Schema.org JSON-LD for Rich Search Results */}
             <script type="application/ld+json">
-                {JSON.stringify({
-                    "@context": "https://schema.org",
-                    "@type": "NewsMediaOrganization",
-                    "name": "Global Pulse | النبض العالمي",
-                    "alternateName": ["النبض العالمي", "Global Pulse", "نبض الحياة"],
-                    "url": "https://global-pulse-news.vercel.app",
-                    "logo": "https://global-pulse-news.vercel.app/logo.png",
-                    "sameAs": [
-                        "https://global-pulse-news.netlify.app",
-                        "https://github.com/6dskdnj66g-dotcom/global-pulse-news"
-                    ],
-                    "description": "موقع إخباري عالمي يقدم آخر الأخبار من مصادر موثوقة - Global news aggregator"
-                })}
+                {JSON.stringify(schemaJSON)}
             </script>
         </Helmet>
     );
