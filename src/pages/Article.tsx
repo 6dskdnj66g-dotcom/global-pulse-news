@@ -3,9 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Article as ArticleType, mockArticles } from '../data/mockData';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Share2, Clock, Calendar, User, Newspaper, Tag, Copy, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Share2, Clock, Calendar, User, Newspaper, Tag, Copy, Check, Volume2, Type, Image as ImageIcon } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import SEO from '../components/common/SEO';
+import AudioPlayer from '../components/article/AudioPlayer';
+import ShareCard from '../components/article/ShareCard';
 
 const Article: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -13,6 +15,10 @@ const Article: React.FC = () => {
     const [article, setArticle] = useState<ArticleType | null>(null);
     const [loading, setLoading] = useState(true);
     const [copied, setCopied] = useState(false);
+
+    // Feature States
+    const [showShareCard, setShowShareCard] = useState(false);
+    const [fontSize, setFontSize] = useState(18); // Default 18px (lg)
 
     const isRtl = i18n.dir() === 'rtl';
 
@@ -146,7 +152,10 @@ const Article: React.FC = () => {
                         </div>
 
                         {/* Body Text */}
-                        <div className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300">
+                        <div
+                            className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
+                            style={{ fontSize: `${fontSize}px` }}
+                        >
                             <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3">
                                 {article.excerpt}
                             </p>
@@ -183,6 +192,24 @@ const Article: React.FC = () => {
                     </div>
                 </div>
             </article>
+
+            {/* Sticky Audio Player */}
+            <AudioPlayer
+                text={article.excerpt + " " + t('article.body_placeholder')}
+                title={article.title}
+                lang={i18n.language}
+            />
+
+            {/* Viral Share Modal */}
+            {showShareCard && (
+                <ShareCard
+                    title={article.title}
+                    category={article.category}
+                    author={article.author}
+                    excerpt={article.excerpt}
+                    onClose={() => setShowShareCard(false)}
+                />
+            )}
         </Layout>
     );
 };
