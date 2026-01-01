@@ -75,7 +75,7 @@ const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData
             <meta name="keywords" content={metaKeywords} />
             <meta name="author" content="Global Pulse Team" />
             <meta name="robots" content="index, follow, max-image-preview:large" />
-            <meta name="google-site-verification" content="ua0y5G-swG0kpNv8fM8BRysjY2CHdpsYsOVcN12RG5c" />
+            <meta name="google-site-verification" content="Ek04_cbD0HckqttwLe--sJZbNZ0V4vz9PWTWVL9NhH4" />
 
             {/* Canonical URL */}
             <link rel="canonical" href="https://global-pulse-news.vercel.app" />
