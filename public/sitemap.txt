@@ -1,0 +1,7 @@
+https://global-pulse-news.vercel.app/
+https://global-pulse-news.vercel.app/category/politics
+https://global-pulse-news.vercel.app/category/economy
+https://global-pulse-news.vercel.app/category/technology
+https://global-pulse-news.vercel.app/category/sports
+https://global-pulse-news.vercel.app/login
+https://global-pulse-news.vercel.app/signup
