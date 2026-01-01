@@ -1,124 +1,234 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import Ticker from '../components/news/Ticker';
-import HeroSection from '../components/news/HeroSection';
-import NewsCard from '../components/news/NewsCard';
 import { Article } from '../data/mockData';
 import { fetchBreakingNews } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
-import { SkeletonGrid, SkeletonHero } from '../components/common/SkeletonCard';
+import { ArrowRight, Share2, TrendingUp, Clock, Globe } from 'lucide-react';
 
 const Home: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [articles, setArticles] = useState<Article[]>([]);
     const [breakingNews, setBreakingNews] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [activeCategory, setActiveCategory] = useState('All');
+
+    const isRtl = i18n.dir() === 'rtl';
 
     useEffect(() => {
         const loadData = async () => {
             setLoading(true);
-
-            // 1. Fetch Batch Real News (10+ items) -> NO OLD MOCKS
-            // 2. Fetch Breaking News Ticker
             const [realArticles, tickerData] = await Promise.all([
                 fetchBatchRealNews(12),
                 fetchBreakingNews()
             ]);
-
             setArticles(realArticles);
 
-            // Inject Market Data into Ticker
-            const marketPrefix = t('home.markets_ticker');
+            // Inject Market Data
+            const marketPrefix = t('home.markets_ticker', { defaultValue: 'MARKETS:' });
             const marketData = `${marketPrefix} BTC $93,000 ▲ | ETH $3,400 ▲ | OIL $78.20 ▼ | GOLD $2,050 ▲ | S&P 500 5,100 ▲`;
             setBreakingNews([marketData, ...tickerData]);
-
             setLoading(false);
         };
-
         loadData();
     }, [t]);
 
-    // === PHASE 10: REAL-TIME UPDATES ===
+    // Real-time updates
     useEffect(() => {
-        // Fetch new real news every 20 seconds
         const interval = setInterval(async () => {
             const newArticle = await fetchRealNews();
             if (newArticle) {
                 setArticles(prev => {
-                    // Avoid duplicates by title
                     const exists = prev.some(a => a.title === newArticle.title);
-                    if (!exists) {
-                        return [newArticle, ...prev];
-                    }
-                    return prev;
+                    return exists ? prev : [newArticle, ...prev];
                 });
             }
-        }, 10000); // Every 10 seconds for faster updates
-
+        }, 15000);
         return () => clearInterval(interval);
     }, []);
 
-    if (loading) {
-        return (
-            <Layout>
-                <SEO title={t('common.loading')} />
-                <div className="container py-8 space-y-8">
-                    {/* Skeleton Ticker */}
-                    <div className="h-10 bg-slate-200 dark:bg-slate-700 rounded animate-pulse" />
-
-                    {/* Skeleton Hero */}
-                    <SkeletonHero />
-
-                    {/* Skeleton Grid */}
-                    <div className="mt-8">
-                        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-6 animate-pulse" />
-                        <SkeletonGrid count={6} />
-                    </div>
-                </div>
-            </Layout>
-        );
-    }
-
-    const featuredArticle = articles[0];
-    const latestNews = articles.slice(1);
+    const filteredArticles = activeCategory === 'All'
+        ? articles
+        : articles.filter(a => a.category.toLowerCase() === activeCategory.toLowerCase());
 
     return (
         <Layout>
             <SEO title={t('nav.home')} />
-            <Ticker items={breakingNews} />
-            {featuredArticle && <HeroSection article={featuredArticle} />}
 
-            <div className="container px-4 pb-12">
-                <h2 className="text-2xl font-bold border-r-4 border-primary pr-4 mb-8 mt-8 text-secondary dark:text-white">
-                    {t('common.latest_news')}
-                </h2>
+            <div className="min-h-screen pb-20 overflow-hidden relative">
+                {/* Aurora Background Effects */}
+                <div className="fixed top-0 left-0 w-full h-[800px] bg-aurora opacity-10 dark:opacity-20 blur-[120px] -z-10 animate-pulse-slow pointer-events-none" />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-black/10 dark:divide-white/10 rtl:divide-x-reverse">
-                    {latestNews.map(article => (
-                        <div key={article.id} className="pl-4 first:pl-0">
-                            <NewsCard article={article} />
+                {/* Hero Section with 3D Float Effect */}
+                <section className="relative pt-32 pb-12 px-4">
+                    <div className="container max-w-7xl mx-auto text-center perspective-1000">
+                        <div className="animate-float">
+                            <span className="inline-flex items-center gap-2 py-1 px-4 rounded-full bg-white/10 dark:bg-black/20 border border-indigo-500/30 text-indigo-600 dark:text-indigo-400 text-sm font-bold tracking-wider mb-8 backdrop-blur-md shadow-lg shadow-indigo-500/10">
+                                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                                {t('home.hero_subtitle', 'LIVE GLOBAL COVERAGE')}
+                            </span>
+
+                            <h1 className="text-6xl md:text-8xl font-display font-bold mb-8 leading-tight">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-600 to-purple-600 dark:from-white dark:via-indigo-400 dark:to-purple-400 text-glow">
+                                    Global Pulse
+                                </span>
+                            </h1>
+
+                            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
+                                {t('home.hero_description', 'Experience the world in real-time. Unfiltered, verified, and immersive 3D news coverage from every corner of the globe.')}
+                            </p>
                         </div>
-                    ))}
-                </div>
 
-                {/* Opinion Section */}
-                <div className="mt-16 pt-12 border-t-4 border-black dark:border-white">
-                    <h2 className="text-3xl font-serif font-black mb-8 text-center italic">{t('home.opinion_title')}</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="bg-paper dark:bg-white/5 p-6 border border-black/5">
-                                <div className="w-12 h-12 bg-black/10 rounded-full mx-auto mb-4" />
-                                <h4 className="font-sans font-bold text-xs uppercase tracking-widest text-primary-accent mb-2">{t('home.columnist_name')}</h4>
-                                <h3 className="font-serif text-xl font-bold leading-tight mb-3 hover:underline">The complex reality of global economic shifts requires new thinking.</h3>
-                                <p className="text-sm font-serif text-muted italic line-clamp-3">
-                                    "In a world where digital borders are fading, we must reassess our traditional understanding of sovereignty..."
-                                </p>
+                        {/* Floating Glass Ticker */}
+                        <div className="glass-panel mx-auto max-w-4xl p-2 flex items-center gap-4 transform hover:scale-[1.02] transition-transform duration-500 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                            <div className="bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-red-500/30 shrink-0 z-10">
+                                {t('common.breaking')}
                             </div>
-                        ))}
+
+                            <div className="flex-1 overflow-hidden relative h-6 mask-gradient">
+                                <div className="absolute w-full animate-marquee whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-8">
+                                    {breakingNews.map((item, i) => (
+                                        <span key={i} className="flex items-center gap-2">
+                                            <Globe size={12} className="text-indigo-500" />
+                                            {item}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </section>
+
+                {/* Main Content */}
+                <main className="container max-w-7xl mx-auto px-4 mt-16">
+                    {/* Controls */}
+                    <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+                        <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 px-4 py-2 rounded-full backdrop-blur-sm">
+                            <Clock size={16} />
+                            <span className="text-sm font-bold uppercase tracking-widest">
+                                {new Date().toLocaleDateString(isRtl ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' })}
+                            </span>
+                        </div>
+
+                        {/* Glass Filters */}
+                        <div className="flex gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-full overflow-x-auto max-w-full">
+                            {['All', 'Politics', 'Economy', 'Technology', 'Sports'].map((cat) => (
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={`px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 transform relative overflow-hidden ${activeCategory === cat
+                                            ? 'text-white shadow-lg scale-105'
+                                            : 'text-slate-600 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
+                                        }`}
+                                >
+                                    {activeCategory === cat && (
+                                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 -z-10 animate-fade-in" />
+                                    )}
+                                    {cat === 'All' ? t('nav.home') : t(`nav.${cat.toLowerCase()}`, { defaultValue: cat })}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* 3D Grid */}
+                    {loading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[1, 2, 3, 4, 5, 6].map((n) => (
+                                <div key={n} className="glass-panel h-96 animate-pulse bg-slate-200/20" />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
+                            {filteredArticles.map((item, index) => (
+                                <Link
+                                    key={item.id}
+                                    to={`/article/${item.id}`}
+                                    className="group relative block h-full"
+                                    style={{ animationDelay: `${index * 100}ms` }}
+                                >
+                                    <article className="glass-panel h-full flex flex-col overflow-hidden transform transition-all duration-500 hover:-translate-y-3 hover:rotate-x-2 shadow-xl hover:shadow-2xl hover:shadow-indigo-500/20">
+                                        <div className="relative h-64 overflow-hidden">
+                                            <img
+                                                src={item.imageUrl}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                                loading="lazy"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+
+                                            <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
+                                                <span className="bg-white/20 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-widest shadow-lg">
+                                                    {t(`nav.${item.category.toLowerCase()}`, { defaultValue: item.category })}
+                                                </span>
+                                                {item.isBreaking && (
+                                                    <span className="relative flex h-3 w-3">
+                                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="p-6 flex flex-col flex-1 relative -mt-12 mx-4 mb-4 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-xl border border-white/40 dark:border-white/5 shadow-lg">
+                                            <div className="flex items-center gap-2 text-[10px] text-indigo-500 dark:text-indigo-400 font-bold mb-3 uppercase tracking-widest">
+                                                <span>{item.source}</span>
+                                                <span className="w-1 h-1 rounded-full bg-indigo-500/50" />
+                                                <span>{item.date}</span>
+                                            </div>
+
+                                            <h3 className="text-xl font-display font-bold mb-3 leading-tight text-slate-900 dark:text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-500 group-hover:to-purple-500 transition-all duration-300">
+                                                {item.title}
+                                            </h3>
+
+                                            <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-3 mb-4 flex-1">
+                                                {item.excerpt}
+                                            </p>
+
+                                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+                                                <span className="flex items-center gap-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 group-hover:translate-x-2 transition-transform duration-300">
+                                                    {t('home.read_more')}
+                                                    <ArrowRight size={14} className={isRtl ? 'rotate-180' : ''} />
+                                                </span>
+                                                <Share2 size={16} className="text-slate-400 hover:text-indigo-500 transition-colors" />
+                                            </div>
+                                        </div>
+                                    </article>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Modern Opinion Section */}
+                    <div className="mt-24 relative">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 rounded-3xl -z-10 blur-xl" />
+                        <h2 className="text-3xl font-display font-bold mb-12 text-center">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+                                {t('home.opinion_title')}
+                            </span>
+                        </h2>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {[1, 2, 3].map((i) => (
+                                <div key={i} className="glass-panel p-8 text-center group hover:bg-white/90 dark:hover:bg-slate-800/90 border-t-4 border-t-transparent hover:border-t-indigo-500 transition-all duration-500">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full mx-auto mb-6 p-1">
+                                        <div className="w-full h-full bg-slate-100 dark:bg-slate-900 rounded-full" />
+                                    </div>
+                                    <h4 className="font-bold text-xs uppercase tracking-widest text-indigo-500 mb-3 block">
+                                        {t('home.columnist_name')}
+                                    </h4>
+                                    <h3 className="font-display text-lg font-bold leading-tight mb-4 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                        "The future of global economics lies in decentralized autonomous organizations..."
+                                    </h3>
+                                    <TrendingUp size={20} className="mx-auto text-slate-300 group-hover:text-indigo-500 transition-colors duration-500" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </main>
             </div>
         </Layout>
     );
