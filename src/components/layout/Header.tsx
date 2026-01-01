@@ -142,30 +142,24 @@ const Header: React.FC = () => {
             {isMenuOpen && (
                 <div className="fixed inset-0 z-[60] flex md:hidden">
                     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
-                    <div className="relative w-[300px] bg-background h-full shadow-2xl p-6 flex flex-col border-r border-border overflow-y-auto">
-                        <div className="flex justify-between items-center mb-8 border-b pb-4">
-                            <span className="font-serif font-bold text-xl">{t('app.title')}</span>
-                            <button onClick={() => setIsMenuOpen(false)}><X size={24} /></button>
+                    <div className="relative w-[300px] bg-background/95 backdrop-blur-xl h-full shadow-2xl p-6 flex flex-col border-r border-border overflow-y-auto">
+                        <div className="flex justify-between items-center mb-8 border-b border-white/10 pb-4">
+                            <span className="font-display font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+                                {t('app.title')}
+                            </span>
+                            <button onClick={() => setIsMenuOpen(false)} className="text-muted hover:text-foreground">
+                                <X size={24} />
+                            </button>
                         </div>
 
-                        {/* Mobile Auth Status */}
-                        <div className="mb-6 p-4 bg-secondary/5 rounded-lg">
-                            {user ? (
-                                <div>
-                                    <p className="font-bold mb-2">Welcome, {user.name}</p>
-                                    <button onClick={logout} className="text-xs uppercase tracking-widest text-red-500 font-bold">Sign Out</button>
-                                </div>
-                            ) : (
-                                <Link to="/login" className="flex items-center gap-2 font-bold text-primary-accent" onClick={() => setIsMenuOpen(false)}>
-                                    <User size={16} /> Sign In
-                                </Link>
-                            )}
-                        </div>
-
-                        <nav className="space-y-6">
+                        {/* Navigation Links (FIRST PRIORITY) */}
+                        <nav className="space-y-4 mb-8 flex-1">
                             <Link
                                 to="/"
-                                className="block text-xl font-serif font-bold hover:text-primary-accent border-l-2 border-transparent hover:border-primary-accent pl-4 transition-all"
+                                className={`block text-lg font-bold px-4 py-2 rounded-lg transition-all ${location.pathname === '/'
+                                        ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                    }`}
                                 onClick={() => setIsMenuOpen(false)}
                             >
                                 {t('nav.home')}
@@ -174,13 +168,32 @@ const Header: React.FC = () => {
                                 <Link
                                     key={item.key}
                                     to={item.path}
-                                    className="block text-xl font-serif font-bold hover:text-primary-accent border-l-2 border-transparent hover:border-primary-accent pl-4 transition-all"
+                                    className={`block text-lg font-bold px-4 py-2 rounded-lg transition-all ${location.pathname === item.path
+                                            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                        }`}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     {t(`nav.${item.key}`)}
                                 </Link>
                             ))}
                         </nav>
+
+                        {/* Mobile Auth Status (BOTTOM) */}
+                        <div className="mt-auto p-4 bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-white/5">
+                            {user ? (
+                                <div>
+                                    <p className="font-bold mb-2 text-sm text-indigo-500">Welcome, {user.name}</p>
+                                    <button onClick={logout} className="text-xs uppercase tracking-widest text-red-500 font-bold hover:text-red-400">
+                                        Sign Out
+                                    </button>
+                                </div>
+                            ) : (
+                                <Link to="/login" className="flex items-center justify-center gap-2 font-bold bg-indigo-500 text-white py-3 rounded-lg hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/20" onClick={() => setIsMenuOpen(false)}>
+                                    <User size={18} /> Sign In
+                                </Link>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
