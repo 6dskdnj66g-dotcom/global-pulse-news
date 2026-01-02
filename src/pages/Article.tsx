@@ -231,6 +231,7 @@ const Article: React.FC = () => {
                     category={article.category}
                     author={article.author}
                     excerpt={article.excerpt}
+                    imageUrl={article.imageUrl}
                     onClose={() => setShowShareCard(false)}
                 />
             )}

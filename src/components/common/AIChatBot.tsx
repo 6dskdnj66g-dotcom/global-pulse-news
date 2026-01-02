@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, Sparkles } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
     id: string;
@@ -11,10 +13,16 @@ interface Message {
 const AIChatBot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState('');
+    const { user } = useAuth();
+    const { i18n } = useTranslation();
+    const isRtl = i18n.language === 'ar';
+
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            text: "مرحباً! أنا Pulse AI - مساعدك الذكي للأخبار. اسألني أي سؤال عن الأخبار أو أي موضوع آخر!\n\nHello! I'm Pulse AI. Ask me anything about news, sports, economy, or just chat!",
+            text: isRtl
+                ? `مرحباً${user?.name ? ' ' + user.name : ''}! أنا Pulse AI - مساعدك الذكي للأخبار. كيف يمكنني مساعدتك اليوم؟`
+                : `Hello${user?.name ? ' ' + user.name : ''}! I'm Pulse AI. How can I help you today?`,
             sender: 'ai',
             timestamp: new Date()
         }
@@ -61,7 +69,8 @@ const AIChatBot: React.FC = () => {
     // === SMART AI RESPONSE ENGINE ===
     const generateAIResponse = (query: string): string => {
         const q = query.toLowerCase();
-        const isArabic = /[\u0600-\u06FF]/.test(query);
+        const hasArabic = /[\u0600-\u06FF]/.test(query);
+        const isArabic = hasArabic || i18n.language === 'ar';
 
         // === PERSONAL / USER CONTEXT ===
         if (q.includes('كوشي') || q.includes('koshi') || q.includes('cochi')) {
@@ -75,6 +84,17 @@ const AIChatBot: React.FC = () => {
             return isArabic
                 ? "أنا Pulse AI، مساعدك الذكي المدمج في موقع Global Pulse. يمكنني مساعدتك في تلخيص الأخبار، الإجابة على أسئلتك، وتقديم معلومات عن أي موضوع!"
                 : "I'm Pulse AI, your intelligent assistant integrated into Global Pulse. I can help summarize news, answer questions, and provide information on any topic!";
+        }
+
+        if (q.includes('من انا') || q.includes('who am i') || q.includes('my name')) {
+            if (user?.name) {
+                return isArabic
+                    ? `أنت ${user.name}، أحد مستخدمينا المميزين في Global Pulse! كيف يمكنني مساعدتك يا ${user.name}؟`
+                    : `You are ${user.name}, one of our valued users at Global Pulse! How can I help you today, ${user.name}?`;
+            }
+            return isArabic
+                ? "أنت زائر عزيز لموقع Global Pulse! يمكنك تسجيل الدخول للحصول على تجربة مخصصة."
+                : "You are a valued visitor at Global Pulse! You can sign in to get a personalized experience.";
         }
 
         // === NEWS CATEGORIES ===

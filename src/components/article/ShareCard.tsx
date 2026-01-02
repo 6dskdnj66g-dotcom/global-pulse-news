@@ -8,10 +8,11 @@ interface ShareCardProps {
     category: string;
     author: string;
     excerpt: string;
+    imageUrl?: string;
     onClose: () => void;
 }
 
-const ShareCard: React.FC<ShareCardProps> = ({ title, category, author, excerpt, onClose }) => {
+const ShareCard: React.FC<ShareCardProps> = ({ title, category, author, excerpt, imageUrl, onClose }) => {
     const cardRef = useRef<HTMLDivElement>(null);
     const [generating, setGenerating] = useState(false);
     const { t } = useTranslation();
@@ -54,13 +55,21 @@ const ShareCard: React.FC<ShareCardProps> = ({ title, category, author, excerpt,
 
                 {/* The Card to Caption */}
                 <div ref={cardRef} className="relative p-8 min-h-[500px] flex flex-col justify-between overflow-hidden">
-                    {/* Dynamic Backgrounds */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700" />
+                    {/* Background Layer */}
+                    {imageUrl ? (
+                        <>
+                            <img src={imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 via-purple-900/80 to-slate-900/90" />
+                        </>
+                    ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-600 to-purple-700" />
+                    )}
+
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
                     <div className="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                     {/* Noise Texture */}
-                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")` }} />
+                    <div className="absolute inset-0 opacity-20 contrast-125 mix-blend-overlay" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E")` }} />
 
                     {/* Content */}
                     <div className="relative z-10 text-white flex flex-col h-full">

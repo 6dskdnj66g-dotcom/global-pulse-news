@@ -43,7 +43,9 @@
         "content_coming_soon": "Content coming soon...",
         "related_articles": "Related Articles",
         "search_placeholder": "Search for news, topics, or categories...",
-        "search_title": "Search News"
+        "search_title": "Search News",
+        "listening": "Now Listening",
+        "listen": "Listen to Article"
     },
     "auth": {
         "signin_title": "Sign in to your account",
@@ -93,6 +95,10 @@
                 "The event reflects cultural shifts in contemporary society.",
                 "Critics see this development as a sign of changing public taste."
             ]
-        }
+        },
+        "download_card": "Download Image",
+        "share_hint": "Save image and post to Instagram/Twitter",
+        "body_placeholder": "Loading article content...",
+        "body_placeholder_2": "Stay tuned for more updates on this story."
     }
 }
