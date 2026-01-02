@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
-import { Download, Share2, X, Image as ImageIcon } from 'lucide-react';
+import { Download, X, Image as ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ShareCardProps {
@@ -22,6 +22,7 @@ const ShareCard: React.FC<ShareCardProps> = ({ title, category, author, excerpt,
 
         try {
             const canvas = await html2canvas(cardRef.current, {
+                // @ts-ignore
                 scale: 2, // High resolution
                 backgroundColor: null,
                 useCORS: true

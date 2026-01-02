@@ -55,7 +55,7 @@ const AIChatBot: React.FC = () => {
             };
             setMessages(prev => [...prev, aiMsg]);
             setIsTyping(false);
-        }, 1200);
+        }, 500);
     };
 
     // === SMART AI RESPONSE ENGINE ===

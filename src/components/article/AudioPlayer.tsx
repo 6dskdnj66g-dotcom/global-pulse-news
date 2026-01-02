@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Volume2, X } from 'lucide-react';
+import { Play, Pause, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface AudioPlayerProps {
@@ -11,7 +11,7 @@ interface AudioPlayerProps {
 const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, title, lang }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
-    const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null);
+    // const [utterance, setUtterance] = useState<SpeechSynthesisUtterance | null>(null); // Removed unused
     const [progress, setProgress] = useState(0);
     const { t } = useTranslation();
 
@@ -61,7 +61,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, title, lang }) => {
             setProgress(Math.min((charIndex / length) * 100, 100));
         };
 
-        setUtterance(newUtterance);
+        // setUtterance(newUtterance);
         window.speechSynthesis.speak(newUtterance);
         setIsPlaying(true);
     };

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Article as ArticleType, mockArticles } from '../data/mockData';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Share2, Clock, Calendar, User, Newspaper, Tag, Copy, Check, Volume2, Type, Image as ImageIcon } from 'lucide-react';
-import { Helmet } from 'react-helmet-async';
+import { ArrowLeft, ArrowRight, Share2, Clock, Calendar, User, Newspaper, Tag, Check, Type, Image as ImageIcon } from 'lucide-react';
 import SEO from '../components/common/SEO';
 import AudioPlayer from '../components/article/AudioPlayer';
 import ShareCard from '../components/article/ShareCard';
@@ -24,12 +23,10 @@ const Article: React.FC = () => {
 
     useEffect(() => {
         setLoading(true);
-        // Simulate fetch delay for smoothness
-        setTimeout(() => {
-            const foundArticle = mockArticles.find(a => a.id === id) || mockArticles[0];
-            setArticle(foundArticle);
-            setLoading(false);
-        }, 500);
+        setLoading(true);
+        const foundArticle = mockArticles.find(a => a.id === id) || mockArticles[0];
+        setArticle(foundArticle);
+        setLoading(false);
     }, [id]);
 
     if (loading) {
@@ -133,6 +130,34 @@ const Article: React.FC = () => {
 
                     {/* Content Container */}
                     <div className="glass-panel p-8 md:p-12 relative">
+                        {/* Reading Tools (Sticky) */}
+                        <div className="sticky top-24 z-30 flex justify-end gap-2 mb-4">
+                            <div className="glass-panel p-1 flex items-center gap-1 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-md">
+                                <button
+                                    onClick={() => setFontSize(Math.max(14, fontSize - 2))}
+                                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                    title="Decrease Font Size"
+                                >
+                                    <Type size={14} />
+                                </button>
+                                <span className="text-xs font-bold w-6 text-center">{fontSize}</span>
+                                <button
+                                    onClick={() => setFontSize(Math.min(24, fontSize + 2))}
+                                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                    title="Increase Font Size"
+                                >
+                                    <Type size={18} />
+                                </button>
+                            </div>
+                            <button
+                                onClick={() => setShowShareCard(true)}
+                                className="glass-panel p-3 bg-indigo-500 text-white shadow-lg hover:bg-indigo-600 transition-colors"
+                                title="Create Viral Image"
+                            >
+                                <ImageIcon size={18} />
+                            </button>
+                        </div>
+
                         {/* AI Summary Box */}
                         <div className="mb-12 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl p-6 border-l-4 border-indigo-500">
                             <h2 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mb-4 flex items-center gap-2">

@@ -17,7 +17,9 @@ export default {
             colors: {
                 background: "var(--color-background)",
                 foreground: "var(--color-text)",
+                muted: "var(--color-muted)",
                 border: "var(--color-border)",
+                paper: "var(--color-paper)",
                 // Aurora Palette
                 primary: {
                     DEFAULT: "#6366f1", // Indigo 500

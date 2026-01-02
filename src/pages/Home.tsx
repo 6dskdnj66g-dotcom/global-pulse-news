@@ -45,7 +45,7 @@ const Home: React.FC = () => {
                     return exists ? prev : [newArticle, ...prev];
                 });
             }
-        }, 15000);
+        }, 5000);
         return () => clearInterval(interval);
     }, []);
 
@@ -121,8 +121,8 @@ const Home: React.FC = () => {
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
                                     className={`px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 transform relative overflow-hidden ${activeCategory === cat
-                                            ? 'text-white shadow-lg scale-105'
-                                            : 'text-slate-600 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
+                                        ? 'text-white shadow-lg scale-105'
+                                        : 'text-slate-600 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
                                         }`}
                                 >
                                     {activeCategory === cat && (
