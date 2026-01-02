@@ -45,7 +45,7 @@ const Home: React.FC = () => {
                     return exists ? prev : [newArticle, ...prev];
                 });
             }
-        }, 5000);
+        }, 30000); // 30 seconds - balanced for performance
         return () => clearInterval(interval);
     }, []);
 

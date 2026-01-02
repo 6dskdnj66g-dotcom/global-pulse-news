@@ -23,7 +23,6 @@ const Article: React.FC = () => {
 
     useEffect(() => {
         setLoading(true);
-        setLoading(true);
         const foundArticle = mockArticles.find(a => a.id === id) || mockArticles[0];
         setArticle(foundArticle);
         setLoading(false);
