@@ -6,6 +6,7 @@ import { fetchBreakingNews } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
+import { saveArticleToDb } from '../services/articleService';
 import { ArrowRight, Share2, TrendingUp, Clock, Globe } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -25,6 +26,9 @@ const Home: React.FC = () => {
                 fetchBreakingNews()
             ]);
             setArticles(realArticles);
+
+            // Auto-save all articles to DB for direct link support
+            realArticles.forEach(article => saveArticleToDb(article));
 
             // Inject Market Data
             const marketPrefix = t('home.markets_ticker', { defaultValue: 'MARKETS:' });

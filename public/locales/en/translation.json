@@ -96,6 +96,9 @@
                 "Critics see this development as a sign of changing public taste."
             ]
         },
+        "not_found_title": "Article Not Found",
+        "not_found_message": "This article may have expired or the link is invalid.",
+        "back_to_home": "Back to Home",
         "download_card": "Download Image",
         "share_hint": "Save image and post to Instagram/Twitter",
         "body_placeholder": "Loading article content...",

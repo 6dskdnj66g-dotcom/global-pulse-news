@@ -55,8 +55,8 @@ const Article: React.FC = () => {
                 }
             }
 
-            // Fallback: If absolutely nothing found, default to first mock (or 404)
-            setArticle(mockArticles[0]);
+            // Fallback: Article not found anywhere
+            setArticle(null);
             setLoading(false);
         };
 
@@ -78,7 +78,30 @@ const Article: React.FC = () => {
         );
     }
 
-    if (!article) return null;
+    if (!article) {
+        return (
+            <Layout>
+                <div className="min-h-screen pt-32 container max-w-2xl mx-auto px-4 text-center">
+                    <div className="glass-panel p-12 rounded-2xl">
+                        <Newspaper size={64} className="mx-auto text-slate-400 mb-6" />
+                        <h1 className="text-3xl font-bold mb-4 text-slate-800 dark:text-white">
+                            {t('article.not_found_title', 'Article Not Found')}
+                        </h1>
+                        <p className="text-slate-600 dark:text-slate-400 mb-8">
+                            {t('article.not_found_message', 'This article may have expired or the link is invalid.')}
+                        </p>
+                        <a
+                            href="/"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold py-3 px-8 rounded-full hover:shadow-lg transition-all"
+                        >
+                            {isRtl ? <ArrowRight size={18} /> : <ArrowLeft size={18} />}
+                            {t('article.back_to_home', 'Back to Home')}
+                        </a>
+                    </div>
+                </div>
+            </Layout>
+        );
+    }
 
     // Generate expanded summary logic reusing translations
     const getSummary = () => {
