@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Article as ArticleType, mockArticles } from '../data/mockData';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import ShareCard from '../components/article/ShareCard';
 
 const Article: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const location = useLocation();
     const { t, i18n } = useTranslation();
     const [article, setArticle] = useState<ArticleType | null>(null);
     const [loading, setLoading] = useState(true);
@@ -23,10 +24,25 @@ const Article: React.FC = () => {
 
     useEffect(() => {
         setLoading(true);
-        const foundArticle = mockArticles.find(a => a.id === id) || mockArticles[0];
-        setArticle(foundArticle);
+        // Priority 1: Check if article data was passed via navigation state (Real News)
+        if (location.state?.article) {
+            setArticle(location.state.article);
+            setLoading(false);
+            return;
+        }
+
+        // Priority 2: Check if it's a mock article (Static Data)
+        const foundArticle = mockArticles.find(a => a.id === id);
+        if (foundArticle) {
+            setArticle(foundArticle);
+        } else {
+            // Fallback for direct link to unknown dynamic ID (could fetch from API if real backend existed)
+            // For now, show a "Not Found" state or generic placeholder if needed, but here we keep the first mock as safe fallback to prevent crash
+            // Ideally, you'd show a 404 component here.
+            setArticle(mockArticles[0]);
+        }
         setLoading(false);
-    }, [id]);
+    }, [id, location.state]);
 
     if (loading) {
         return (
