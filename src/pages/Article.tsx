@@ -28,6 +28,34 @@ const Article: React.FC = () => {
         const loadArticle = async () => {
             setLoading(true);
 
+            // Priority 0: Check for encoded data in URL (INSTANT LOAD - no network needed)
+            const urlParams = new URLSearchParams(window.location.search);
+            const encodedData = urlParams.get('data');
+            if (encodedData) {
+                try {
+                    const decoded = JSON.parse(decodeURIComponent(encodedData));
+                    const instantArticle = {
+                        id: id || 'shared',
+                        title: decoded.t,
+                        excerpt: decoded.e,
+                        imageUrl: decoded.i,
+                        author: decoded.a || 'Global Pulse',
+                        category: decoded.c || 'News',
+                        source: decoded.s || 'Global Pulse',
+                        date: decoded.d || new Date().toISOString(),
+                        sourceUrl: decoded.u,
+                        isBreaking: false
+                    };
+                    setArticle(instantArticle as any);
+                    setLoading(false);
+                    // Save to DB for future clean URL access
+                    saveArticleToDb(instantArticle as any);
+                    return;
+                } catch (e) {
+                    console.log('Failed to parse URL data, falling back to DB');
+                }
+            }
+
             // Priority 1: Check if article data was passed via navigation state (Real News)
             if (location.state?.article) {
                 setArticle(location.state.article);

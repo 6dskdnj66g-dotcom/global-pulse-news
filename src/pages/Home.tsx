@@ -202,7 +202,17 @@ const Home: React.FC = () => {
                                                     onClick={async (e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        const shareUrl = window.location.origin + `/article/${item.id}`;
+                                                        const articleData = encodeURIComponent(JSON.stringify({
+                                                            t: item.title,
+                                                            e: item.excerpt,
+                                                            i: item.imageUrl,
+                                                            a: item.author,
+                                                            c: item.category,
+                                                            s: item.source,
+                                                            d: item.date,
+                                                            u: item.sourceUrl
+                                                        }));
+                                                        const shareUrl = window.location.origin + `/article/${item.id}?data=${articleData}`;
                                                         if (navigator.share) {
                                                             try {
                                                                 await navigator.share({
