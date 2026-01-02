@@ -147,6 +147,7 @@ const Home: React.FC = () => {
                                 <Link
                                     key={item.id}
                                     to={`/article/${item.id}`}
+                                    state={{ article: item }}
                                     className="group relative block h-full"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
