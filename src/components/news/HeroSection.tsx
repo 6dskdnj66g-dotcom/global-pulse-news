@@ -12,7 +12,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ article }) => {
     return (
         <section className="container mb-12 py-8 border-b border-black dark:border-white animate-fade-in">
             <div
-                onClick={() => navigate(`/article/${article.id}`)}
+                onClick={() => navigate(`/article/${article.id}`, { state: { article } })}
                 className="cursor-pointer group grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
             >
                 {/* Main Content (Left on Desktop) */}
