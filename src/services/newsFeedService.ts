@@ -42,6 +42,9 @@ const ALL_FEEDS = [
     { name: 'Reuters Top', url: 'https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best', category: 'Economy' },
     { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml', category: 'Politics' },
     { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml', category: 'Politics' },
+    { name: 'The New York Times', url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', category: 'Politics' },
+    { name: 'Axios Main', url: 'https://www.axios.com/feeds/feed.rss', category: 'Politics' },
+    { name: 'Axios Econ', url: 'https://api.axios.com/feed/', category: 'Economy' },
 
     // ===== TECHNOLOGY =====
     { name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Technology' },
@@ -55,6 +58,12 @@ const ALL_FEEDS = [
     { name: 'Sky Sports', url: 'https://www.skysports.com/rss/12040', category: 'Sports' },
     { name: 'Marca (Spain)', url: 'https://e00-marca.uecdn.es/rss/portada.xml', category: 'Sports' },
     { name: 'AS (Spain)', url: 'https://as.com/rss/tags/ultimas_noticias.xml', category: 'Sports' },
+
+    // ===== MAGAZINES & CULTURE =====
+    { name: 'The Economist', url: 'https://www.economist.com/the-world-this-week/rss.xml', category: 'Economy' },
+    { name: 'TIME Magazine', url: 'https://time.com/feed/', category: 'Culture' },
+    { name: 'Forbes', url: 'https://www.forbes.com/business/feed/', category: 'Economy' },
+    { name: 'National Geographic', url: 'https://www.nationalgeographic.com/rss/index.xml', category: 'Culture' },
 
     // ===== ECONOMY =====
     { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', category: 'Economy' },
