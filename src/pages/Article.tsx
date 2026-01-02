@@ -8,6 +8,8 @@ import SEO from '../components/common/SEO';
 import AudioPlayer from '../components/article/AudioPlayer';
 import ShareCard from '../components/article/ShareCard';
 
+import { saveArticleToDb, getArticleFromDb } from '../services/articleService';
+
 const Article: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const location = useLocation();
@@ -23,25 +25,42 @@ const Article: React.FC = () => {
     const isRtl = i18n.dir() === 'rtl';
 
     useEffect(() => {
-        setLoading(true);
-        // Priority 1: Check if article data was passed via navigation state (Real News)
-        if (location.state?.article) {
-            setArticle(location.state.article);
-            setLoading(false);
-            return;
-        }
+        const loadArticle = async () => {
+            setLoading(true);
 
-        // Priority 2: Check if it's a mock article (Static Data)
-        const foundArticle = mockArticles.find(a => a.id === id);
-        if (foundArticle) {
-            setArticle(foundArticle);
-        } else {
-            // Fallback for direct link to unknown dynamic ID (could fetch from API if real backend existed)
-            // For now, show a "Not Found" state or generic placeholder if needed, but here we keep the first mock as safe fallback to prevent crash
-            // Ideally, you'd show a 404 component here.
+            // Priority 1: Check if article data was passed via navigation state (Real News)
+            if (location.state?.article) {
+                setArticle(location.state.article);
+                setLoading(false);
+                // Background Save: Persist to DB for future direct access
+                saveArticleToDb(location.state.article);
+                return;
+            }
+
+            // Priority 2: Check if it's a mock article (Static Data)
+            const foundMock = mockArticles.find(a => a.id === id);
+            if (foundMock) {
+                setArticle(foundMock);
+                setLoading(false);
+                return;
+            }
+
+            // Priority 3: Try to fetch from Firestore (Database persistence)
+            if (id) {
+                const dbArticle = await getArticleFromDb(id);
+                if (dbArticle) {
+                    setArticle(dbArticle);
+                    setLoading(false);
+                    return;
+                }
+            }
+
+            // Fallback: If absolutely nothing found, default to first mock (or 404)
             setArticle(mockArticles[0]);
-        }
-        setLoading(false);
+            setLoading(false);
+        };
+
+        loadArticle();
     }, [id, location.state]);
 
     if (loading) {
