@@ -194,7 +194,31 @@ const Home: React.FC = () => {
                                                     {t('home.read_more')}
                                                     <ArrowRight size={14} className={isRtl ? 'rotate-180' : ''} />
                                                 </span>
-                                                <Share2 size={16} className="text-slate-400 hover:text-indigo-500 transition-colors" />
+                                                <button
+                                                    onClick={async (e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        const shareUrl = window.location.origin + `/article/${item.id}`;
+                                                        if (navigator.share) {
+                                                            try {
+                                                                await navigator.share({
+                                                                    title: item.title,
+                                                                    text: item.excerpt,
+                                                                    url: shareUrl
+                                                                });
+                                                            } catch (err) {
+                                                                console.log('Share cancelled');
+                                                            }
+                                                        } else {
+                                                            navigator.clipboard.writeText(shareUrl);
+                                                            alert(t('common.link_copied', 'Link copied!'));
+                                                        }
+                                                    }}
+                                                    className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                                    aria-label="Share"
+                                                >
+                                                    <Share2 size={16} className="text-slate-400 hover:text-indigo-500 transition-colors" />
+                                                </button>
                                             </div>
                                         </div>
                                     </article>
