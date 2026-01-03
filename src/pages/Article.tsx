@@ -151,7 +151,6 @@ const Article: React.FC = () => {
 
     const handleShare = async () => {
         const url = window.location.href;
-        const text = `Check out this article: ${article.title}`;
 
         // Cast navigator to any to satisfy TypeScript if the Share API types aren't available
         if ((navigator as any).share) {
