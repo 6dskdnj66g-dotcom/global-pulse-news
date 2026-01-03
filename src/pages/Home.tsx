@@ -127,8 +127,8 @@ const Home: React.FC = () => {
                                 </span>
                             </h1>
 
-                            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed font-light">
-                                {t('home.hero_description', 'Experience the world in real-time. Unfiltered, verified, and immersive 3D news coverage from every corner of the globe.')}
+                            <p className="text-lg md:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+                                {t('home.hero_description', 'Your trusted source for breaking news. Real-time updates from around the world, verified and delivered instantly.')}
                             </p>
                         </div>
 
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
                 </section>
 
                 {/* Main Content */}
-                <main className="container max-w-7xl mx-auto px-4 mt-16">
+                <main className="container max-w-7xl mx-auto px-4 mt-8">
                     {/* Controls */}
                     <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
                         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 px-4 py-2 rounded-full backdrop-blur-sm">
@@ -165,13 +165,13 @@ const Home: React.FC = () => {
                             </span>
                         </div>
 
-                        {/* Glass Filters */}
-                        <div className="flex gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-full overflow-x-auto max-w-full">
+                        {/* Glass Filters - Scrollable on mobile */}
+                        <div className="flex gap-1 p-1 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-full overflow-x-auto max-w-full scrollbar-hide">
                             {['All', 'Politics', 'Economy', 'Technology', 'Sports', 'Health'].map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
-                                    className={`px-6 py-2 rounded-full font-bold text-sm transition-all duration-300 transform relative overflow-hidden ${activeCategory === cat
+                                    className={`px-3 py-1.5 rounded-full font-bold text-xs whitespace-nowrap transition-all duration-300 transform relative overflow-hidden ${activeCategory === cat
                                         ? 'text-white shadow-lg scale-105'
                                         : 'text-slate-600 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
                                         }`}
@@ -179,7 +179,7 @@ const Home: React.FC = () => {
                                     {activeCategory === cat && (
                                         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 -z-10 animate-fade-in" />
                                     )}
-                                    {cat === 'All' ? t('nav.home') : t(`nav.${cat.toLowerCase()}`, { defaultValue: cat })}
+                                    {cat === 'All' ? t('common.all', 'All') : t(`nav.${cat.toLowerCase()}`, { defaultValue: cat })}
                                 </button>
                             ))}
                         </div>
