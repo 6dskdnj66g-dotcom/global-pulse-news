@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { askGeminiAI } from '../../services/geminiService';
 
 interface Message {
     id: string;
@@ -53,8 +54,9 @@ const AIChatBot: React.FC = () => {
         setInput('');
         setIsTyping(true);
 
-        setTimeout(() => {
-            const responseText = generateAIResponse(userMsg.text);
+        // Call Gemini AI for intelligent response
+        try {
+            const responseText = await askGeminiAI(userMsg.text);
             const aiMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 text: responseText,
@@ -62,100 +64,17 @@ const AIChatBot: React.FC = () => {
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, aiMsg]);
-            setIsTyping(false);
-        }, 500);
-    };
-
-    // === SMART AI RESPONSE ENGINE ===
-    const generateAIResponse = (query: string): string => {
-        const q = query.toLowerCase();
-        const hasArabic = /[\u0600-\u06FF]/.test(query);
-        const isArabic = hasArabic || i18n.language === 'ar';
-
-        // === PERSONAL / USER CONTEXT ===
-        if (q.includes('كوشي') || q.includes('koshi') || q.includes('cochi')) {
-            if (isArabic) {
-                return "كوشي هو مستخدم مميز لموقع Global Pulse! يبدو أنه شخص مهتم بالأخبار العالمية والتكنولوجيا. هل تريد معرفة المزيد عن الأخبار المخصصة لك؟";
-            }
-            return "Koshi is a valued user of Global Pulse! They seem interested in global news and technology. Would you like personalized news recommendations?";
+        } catch (error) {
+            const errorMsg: Message = {
+                id: (Date.now() + 1).toString(),
+                text: i18n.language === 'ar'
+                    ? 'عذراً، حدث خطأ. حاول مرة أخرى.'
+                    : 'Sorry, an error occurred. Please try again.',
+                sender: 'ai',
+                timestamp: new Date()
+            };
+            setMessages(prev => [...prev, errorMsg]);
         }
-
-        if (q.includes('من انت') || q.includes('who are you')) {
-            return isArabic
-                ? "أنا Pulse AI، مساعدك الذكي المدمج في موقع Global Pulse. يمكنني مساعدتك في تلخيص الأخبار، الإجابة على أسئلتك، وتقديم معلومات عن أي موضوع!"
-                : "I'm Pulse AI, your intelligent assistant integrated into Global Pulse. I can help summarize news, answer questions, and provide information on any topic!";
-        }
-
-        if (q.includes('من انا') || q.includes('who am i') || q.includes('my name')) {
-            if (user?.name) {
-                return isArabic
-                    ? `أنت ${user.name}، أحد مستخدمينا المميزين في Global Pulse! كيف يمكنني مساعدتك يا ${user.name}؟`
-                    : `You are ${user.name}, one of our valued users at Global Pulse! How can I help you today, ${user.name}?`;
-            }
-            return isArabic
-                ? "أنت زائر عزيز لموقع Global Pulse! يمكنك تسجيل الدخول للحصول على تجربة مخصصة."
-                : "You are a valued visitor at Global Pulse! You can sign in to get a personalized experience.";
-        }
-
-        // === NEWS CATEGORIES ===
-        if (q.includes('ملخص') || q.includes('summary') || q.includes('summarize')) {
-            return isArabic
-                ? "📰 ملخص اليوم:\n• السياسة: محادثات دولية حول أزمة المناخ\n• الاقتصاد: الأسواق تشهد انتعاشاً بنسبة 3%\n• الرياضة: ريال مدريد يتصدر الدوري الإسباني\n• التكنولوجيا: Apple تعلن عن منتجات جديدة"
-                : "📰 Today's Summary:\n• Politics: International climate talks progress\n• Economy: Markets rally 3% on positive data\n• Sports: Real Madrid leads La Liga\n• Tech: Apple announces new products";
-        }
-
-        if (q.includes('رياضة') || q.includes('sport') || q.includes('football') || q.includes('كرة')) {
-            return isArabic
-                ? "⚽ أخبار الرياضة:\n• ريال مدريد يفوز على برشلونة 2-1\n• ليفربول يتصدر الدوري الإنجليزي\n• منتخب الأرجنتين يستعد لكأس العالم\n\nالمصادر: Marca, AS, ESPN, BBC Sport"
-                : "⚽ Sports Update:\n• Real Madrid beats Barcelona 2-1\n• Liverpool leads Premier League\n• Argentina preparing for World Cup\n\nSources: Marca, AS, ESPN, BBC Sport";
-        }
-
-        if (q.includes('اقتصاد') || q.includes('economy') || q.includes('market') || q.includes('سوق')) {
-            return isArabic
-                ? "💹 أخبار الاقتصاد:\n• الذهب يرتفع إلى 2050 دولار للأونصة\n• البنك الفيدرالي يثبت الفائدة\n• النفط يستقر عند 78 دولار\n\nالمصادر: Reuters, Bloomberg"
-                : "💹 Economy Update:\n• Gold rises to $2050/oz\n• Fed holds interest rates steady\n• Oil stable at $78/barrel\n\nSources: Reuters, Bloomberg";
-        }
-
-        if (q.includes('تكنولوجيا') || q.includes('tech') || q.includes('technology') || q.includes('ai')) {
-            return isArabic
-                ? "🤖 أخبار التكنولوجيا:\n• OpenAI تطلق GPT-5\n• Apple تكشف عن Vision Pro 2\n• Google تطور روبوت Gemini\n\nالمصادر: TechCrunch, The Verge"
-                : "🤖 Tech Update:\n• OpenAI launches GPT-5\n• Apple reveals Vision Pro 2\n• Google develops Gemini robot\n\nSources: TechCrunch, The Verge";
-        }
-
-        if (q.includes('سياسة') || q.includes('politic') || q.includes('حرب') || q.includes('war')) {
-            return isArabic
-                ? "🌍 أخبار السياسة:\n• قمة G20 تناقش تغير المناخ\n• انتخابات أمريكية قادمة\n• محادثات سلام في الشرق الأوسط\n\nالمصادر: BBC, Al Jazeera, CNN"
-                : "🌍 Politics Update:\n• G20 summit discusses climate\n• US elections upcoming\n• Middle East peace talks progress\n\nSources: BBC, Al Jazeera, CNN";
-        }
-
-        // === GENERAL QUESTIONS ===
-        if (q.includes('الطقس') || q.includes('weather')) {
-            return isArabic
-                ? "🌤️ للأسف لا أستطيع عرض الطقس الحي، لكن يمكنك زيارة weather.com للحصول على أحدث التوقعات!"
-                : "🌤️ I can't show live weather, but you can visit weather.com for the latest forecasts!";
-        }
-
-        if (q.includes('مساعدة') || q.includes('help')) {
-            return isArabic
-                ? "🆘 يمكنني مساعدتك في:\n• تلخيص الأخبار اليومية\n• أخبار الرياضة والاقتصاد والتكنولوجيا\n• الإجابة على أسئلتك العامة\n\nجرب: 'ملخص الأخبار' أو 'أخبار الرياضة'"
-                : "🆘 I can help with:\n• Daily news summaries\n• Sports, Economy, Tech news\n• Answering your questions\n\nTry: 'news summary' or 'sports update'";
-        }
-
-        // === GREETINGS ===
-        if (q.includes('مرحبا') || q.includes('hello') || q.includes('hi') || q.includes('السلام')) {
-            return isArabic
-                ? "مرحباً! 👋 كيف يمكنني مساعدتك اليوم؟ اسألني عن الأخبار أو أي موضوع يهمك!"
-                : "Hello! 👋 How can I help you today? Ask me about news or any topic you're interested in!";
-        }
-
-        if (q.includes('شكرا') || q.includes('thank')) {
-            return isArabic ? "عفواً! 😊 هل تريد معرفة شيء آخر؟" : "You're welcome! 😊 Anything else you'd like to know?";
-        }
-
-        // === DEFAULT RESPONSE ===
-        return isArabic
-            ? "🤔 سؤال جيد! للأسف لا أملك معلومات محددة عن هذا الموضوع حالياً. جرب سؤالي عن:\n• الأخبار والملخصات\n• الرياضة والاقتصاد\n• التكنولوجيا والسياسة"
-            : "🤔 Good question! I don't have specific info on that right now. Try asking about:\n• News and summaries\n• Sports and Economy\n• Technology and Politics";
     };
 
     return (
