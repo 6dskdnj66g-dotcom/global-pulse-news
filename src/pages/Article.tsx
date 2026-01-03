@@ -131,15 +131,23 @@ const Article: React.FC = () => {
         );
     }
 
-    // Generate expanded summary logic reusing translations
-    const getSummary = () => {
+    // Generate key points from excerpt (split into sentences for cleaner display)
+    const getKeyPoints = () => {
         const categoryKey = article.category.toLowerCase() as 'politics' | 'economy' | 'technology' | 'sports' | 'culture';
         const contextPoints = t(`article.context.${categoryKey}`, { returnObjects: true });
         const points = Array.isArray(contextPoints) ? contextPoints : [];
-        return [article.excerpt, ...points];
+
+        // Extract key sentences from excerpt for summary bullets
+        const excerptSentences = article.excerpt
+            .split(/[.!?]+/)
+            .filter(s => s.trim().length > 20)
+            .slice(0, 2)
+            .map(s => s.trim() + '.');
+
+        return [...excerptSentences, ...points.slice(0, 2)];
     };
 
-    const summaryPoints = getSummary();
+    const keyPoints = getKeyPoints();
 
     const handleShare = () => {
         const url = window.location.href;
@@ -243,17 +251,17 @@ const Article: React.FC = () => {
                             </button>
                         </div>
 
-                        {/* AI Summary Box */}
+                        {/* Summary Box - Key Points Only */}
                         <div className="mb-12 bg-indigo-50/50 dark:bg-indigo-900/10 rounded-2xl p-6 border-l-4 border-indigo-500">
                             <h2 className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mb-4 flex items-center gap-2">
                                 <div className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white">
                                     <Newspaper size={18} />
                                 </div>
-                                {t('article.summary_title', 'Smart Summary')}
+                                {t('article.summary_title', 'Summary')}
                             </h2>
                             <ul className="space-y-3">
-                                {summaryPoints.map((point, i) => (
-                                    <li key={i} className="flex gap-3 text-slate-700 dark:text-slate-300 leading-relaxed font-sans text-lg">
+                                {keyPoints.map((point, i) => (
+                                    <li key={i} className="flex gap-3 text-slate-700 dark:text-slate-300 leading-relaxed font-sans text-base">
                                         <span className="text-indigo-500 font-bold">•</span>
                                         {point}
                                     </li>
@@ -261,20 +269,22 @@ const Article: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* Body Text */}
-                        <div
-                            className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
-                            style={{ fontSize: `${fontSize}px` }}
-                        >
-                            <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3">
-                                {article.excerpt}
-                            </p>
-                            <p>
-                                {t('article.body_placeholder', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')}
-                            </p>
-                            <p>
-                                {t('article.body_placeholder_2', 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')}
-                            </p>
+                        {/* Full Article Content */}
+                        <div className="mb-8">
+                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                                📰 {t('article.full_content', 'Full Article')}
+                            </h3>
+                            <div
+                                className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
+                                style={{ fontSize: `${fontSize}px` }}
+                            >
+                                <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3">
+                                    {article.excerpt}
+                                </p>
+                                <p className="text-slate-600 dark:text-slate-400 mt-6 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg border-l-4 border-slate-300 dark:border-slate-600">
+                                    {t('article.content_note', 'This is a summary of the article. Click "Read Full Story" below to read the complete article from the original source.')}
+                                </p>
+                            </div>
                         </div>
 
                         {/* Action Bar */}

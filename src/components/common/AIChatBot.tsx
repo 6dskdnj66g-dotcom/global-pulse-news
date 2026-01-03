@@ -103,6 +103,9 @@ const AIChatBot: React.FC = () => {
                         <div>
                             <h3 className="font-bold flex items-center gap-2">
                                 Pulse AI <Sparkles size={14} className="text-yellow-300" />
+                                <span className="text-[8px] bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                    BETA
+                                </span>
                             </h3>
                             <p className="text-[10px] opacity-80 uppercase tracking-widest">
                                 {isRtl ? 'مساعد الأخبار الذكي' : 'Smart News Assistant'}

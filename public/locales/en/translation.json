@@ -123,7 +123,9 @@
         "download_card": "Download Image",
         "share_hint": "Save image and share on Instagram or Twitter",
         "body_placeholder": "Loading article content...",
-        "body_placeholder_2": "Stay tuned for more updates on this story."
+        "body_placeholder_2": "Stay tuned for more updates on this story.",
+        "full_content": "Full Article",
+        "content_note": "This is a summary of the article. Click \"Read Full Article\" below to read the complete article from the original source."
     },
     "chatbot": {
         "title": "AI Assistant",

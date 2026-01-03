@@ -74,21 +74,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, title, lang }) => {
     };
 
     return (
-        <div className="fixed bottom-4 right-4 md:right-8 z-50 animate-slide-up">
-            <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-indigo-500/20 shadow-2xl rounded-full p-2 flex items-center gap-4 pr-6">
+        <div className="fixed bottom-20 right-4 md:right-8 z-40 animate-slide-up">
+            <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-indigo-500/20 shadow-lg rounded-full p-1.5 flex items-center gap-2 pr-4">
 
                 <button
                     onClick={handlePlay}
-                    className="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform"
+                    className="w-9 h-9 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-md hover:scale-105 transition-transform"
                 >
-                    {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
+                    {isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
                 </button>
 
                 <div className="flex flex-col">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-500">
-                        {isPlaying ? t('common.listening', 'Now Listening') : t('common.listen', 'Listen to Article')}
+                    <span className="text-[9px] font-bold uppercase tracking-widest text-indigo-500">
+                        {isPlaying ? t('common.listening', 'Now Listening') : t('common.listen', 'Listen')}
                     </span>
-                    <div className="w-32 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-1 overflow-hidden">
+                    <div className="w-20 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mt-0.5 overflow-hidden">
                         <div
                             className="h-full bg-indigo-500 transition-all duration-300"
                             style={{ width: `${progress}%` }}
@@ -97,16 +97,16 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ text, title, lang }) => {
                 </div>
 
                 {isPlaying && (
-                    <div className="flex items-center gap-1">
-                        <span className="w-1 h-3 bg-indigo-500 rounded-full animate-music-bar-1" />
-                        <span className="w-1 h-5 bg-indigo-500 rounded-full animate-music-bar-2" />
-                        <span className="w-1 h-2 bg-indigo-500 rounded-full animate-music-bar-3" />
+                    <div className="flex items-center gap-0.5">
+                        <span className="w-0.5 h-2 bg-indigo-500 rounded-full animate-music-bar-1" />
+                        <span className="w-0.5 h-3 bg-indigo-500 rounded-full animate-music-bar-2" />
+                        <span className="w-0.5 h-1.5 bg-indigo-500 rounded-full animate-music-bar-3" />
                     </div>
                 )}
 
                 {(isPlaying || isPaused) && (
-                    <button onClick={handleStop} className="ml-2 text-slate-400 hover:text-red-500 transition-colors">
-                        <X size={16} />
+                    <button onClick={handleStop} className="text-slate-400 hover:text-red-500 transition-colors">
+                        <X size={14} />
                     </button>
                 )}
             </div>
