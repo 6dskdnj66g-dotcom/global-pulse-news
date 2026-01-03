@@ -62,10 +62,11 @@ export const fetchNews = async (category?: string): Promise<Article[]> => {
 export const fetchBreakingNews = async (): Promise<string[]> => {
     if (!API_KEY) {
         return Promise.resolve([
-            "Breaking: Global Climate Summit announces historic agreement.",
-            "Update: Tech sector sees 5% surge in early trading.",
-            "Sports: Championship finals set for next Sunday.",
-            "World: New peace talks scheduled for next month."
+            "🔴 BREAKING: Major diplomatic summit begins today with world leaders gathering to discuss global security",
+            "🌍 WORLD: Historic peace agreement signed between nations after months of negotiations",
+            "⚡ URGENT: International humanitarian mission launched to assist disaster-affected regions",
+            "🔴 BREAKING: World Health Organization announces major breakthrough in disease prevention",
+            "🌐 GLOBAL: United Nations Security Council convenes emergency session on international crisis"
         ]);
     }
 

@@ -33,10 +33,8 @@ const Home: React.FC = () => {
             // Auto-save all articles to DB for direct link support
             realArticles.forEach(article => saveArticleToDb(article));
 
-            // Inject Market Data
-            const marketPrefix = t('home.markets_ticker', { defaultValue: 'MARKETS:' });
-            const marketData = `${marketPrefix} BTC $93,000 ▲ | ETH $3,400 ▲ | OIL $78.20 ▼ | GOLD $2,050 ▲ | S&P 500 5,100 ▲`;
-            setBreakingNews([marketData, ...tickerData]);
+            // Set breaking news headlines (no market data)
+            setBreakingNews(tickerData);
             setLoading(false);
         };
         loadData();
