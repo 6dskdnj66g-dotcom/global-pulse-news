@@ -180,7 +180,20 @@ const Article: React.FC = () => {
     const keyPoints = getKeyPoints();
 
     const handleShare = async () => {
-        const url = window.location.href;
+        // Encode article data in URL so recipients can view the article
+        const articleData = {
+            t: article.title,
+            e: article.excerpt,
+            i: article.imageUrl,
+            a: article.author,
+            c: article.category,
+            s: article.source,
+            d: article.date,
+            u: article.sourceUrl
+        };
+        const encodedData = encodeURIComponent(JSON.stringify(articleData));
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?data=${encodedData}`;
 
         // Cast navigator to any to satisfy TypeScript if the Share API types aren't available
         if ((navigator as any).share) {
@@ -188,7 +201,7 @@ const Article: React.FC = () => {
                 await (navigator as any).share({
                     title: article.title,
                     text: article.excerpt,
-                    url: url,
+                    url: shareUrl,
                 });
                 return; // Shared successfully
             } catch (error) {
@@ -197,7 +210,7 @@ const Article: React.FC = () => {
             }
         }
 
-        navigator.clipboard.writeText(url);
+        navigator.clipboard.writeText(shareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
