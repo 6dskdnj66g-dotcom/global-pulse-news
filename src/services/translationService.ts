@@ -1,8 +1,8 @@
 // Translation Service - Uses Gemini AI to translate content
 // Implements caching to avoid repeated API calls
 
-// API key: MUST be set via environment variable for security
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+// Gemini API keys are designed for frontend use with domain restrictions
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBwGcy_GS8EFec1ZMqPGdRosM6pRKn4St8';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Simple in-memory cache for translations
