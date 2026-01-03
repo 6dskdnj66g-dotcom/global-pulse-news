@@ -9,6 +9,7 @@ import AudioPlayer from '../components/article/AudioPlayer';
 import ShareCard from '../components/article/ShareCard';
 
 import { saveArticleToDb, getArticleFromDb } from '../services/articleService';
+import { expandArticleContent } from '../services/geminiService';
 
 const Article: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,6 +22,8 @@ const Article: React.FC = () => {
     // Feature States
     const [showShareCard, setShowShareCard] = useState(false);
     const [fontSize, setFontSize] = useState(18); // Default 18px (lg)
+    const [aiContent, setAiContent] = useState<string>('');
+    const [loadingAiContent, setLoadingAiContent] = useState(false);
 
     const isRtl = i18n.dir() === 'rtl';
 
@@ -90,6 +93,33 @@ const Article: React.FC = () => {
 
         loadArticle();
     }, [id, location.state]);
+
+    // Fetch AI-expanded content when article loads with insufficient content
+    useEffect(() => {
+        const fetchAiContent = async () => {
+            if (!article) return;
+            // Only expand if content is missing or very short (less than 200 chars)
+            const hasInsufficientContent = !article.content || article.content.length < 200;
+            if (hasInsufficientContent && !aiContent && !loadingAiContent) {
+                setLoadingAiContent(true);
+                try {
+                    const expanded = await expandArticleContent(
+                        article.title,
+                        article.excerpt,
+                        article.category
+                    );
+                    if (expanded && !expanded.startsWith('⚠️')) {
+                        setAiContent(expanded);
+                    }
+                } catch (error) {
+                    console.error('Failed to expand article:', error);
+                } finally {
+                    setLoadingAiContent(false);
+                }
+            }
+        };
+        fetchAiContent();
+    }, [article]);
 
     if (loading) {
         return (
@@ -285,36 +315,61 @@ const Article: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* Article Preview Content - Only show if we have real content or if summary didn't cover it */
-                            article.content && (
-                                <div className="mb-8 relative">
-                                    <div
-                                        className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
-                                        style={{ fontSize: `${fontSize}px` }}
-                                    >
-                                        <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
-                                            {article.excerpt}
+                        {/* Article Preview Content - Show AI content or original */}
+                        <div className="mb-8 relative">
+                            <div
+                                className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
+                                style={{ fontSize: `${fontSize}px` }}
+                            >
+                                <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
+                                    {article.excerpt}
+                                </p>
+
+                                {/* Loading state for AI content */}
+                                {loadingAiContent && (
+                                    <div className="space-y-4 animate-pulse">
+                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-11/12"></div>
+                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                                        <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-10/12"></div>
+                                        <p className="text-sm text-indigo-500 flex items-center gap-2 mt-4">
+                                            <span className="animate-spin">🌀</span>
+                                            {t('article.ai_loading', 'AI is writing a detailed summary...')}
                                         </p>
-
-                                        <div className="space-y-6">
-                                            {/* Display content */}
-                                            {article.content.split('\n').map((paragraph, idx) => (
-                                                paragraph.trim() && (
-                                                    <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
-                                                )
-                                            ))}
-                                            {article.content.includes('[+') && (
-                                                <p className="italic opacity-70 border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-r-lg">
-                                                    {t('article.preview_only', 'This is a preview of the full article.')}
-                                                </p>
-                                            )}
-                                        </div>
                                     </div>
+                                )}
 
-                                    {/* Fade Out Effect */}
-                                    <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 dark:to-transparent flex items-end justify-center pb-8" />
-                                </div>
-                            )}
+                                {/* AI-expanded content */}
+                                {!loadingAiContent && aiContent && (
+                                    <div className="space-y-6">
+                                        {aiContent.split('\n\n').map((paragraph, idx) => (
+                                            paragraph.trim() && (
+                                                <p key={idx} className="text-slate-700 dark:text-slate-300">
+                                                    {paragraph.trim()}
+                                                </p>
+                                            )
+                                        ))}
+                                        <p className="text-xs text-slate-400 border-l-2 border-indigo-500 pl-3 italic mt-6">
+                                            {t('article.ai_generated', 'This summary was generated by Pulse AI to help you understand. Read the original source for complete information.')}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Original content if available and no AI content */}
+                                {!loadingAiContent && !aiContent && article.content && (
+                                    <div className="space-y-6">
+                                        {article.content.split('\n').map((paragraph, idx) => (
+                                            paragraph.trim() && (
+                                                <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
+                                            )
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Fade Out Effect */}
+                            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 dark:to-transparent flex items-end justify-center pb-8" />
+                        </div>
 
                         {/* Premium Read Full Story Button */}
                         <div className="flex flex-col items-center gap-6 mb-12 relative z-10">

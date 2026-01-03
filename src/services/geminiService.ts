@@ -81,3 +81,55 @@ export const askGeminiAI = async (userMessage: string): Promise<string> => {
 };
 
 
+// Article Content Expansion - Generate detailed content from title and excerpt
+const ARTICLE_EXPANSION_PROMPT = `You are a professional news writer for Global Pulse News. Given a news headline and brief description, write a detailed, informative article expansion (3-4 paragraphs, about 250-350 words).
+
+Guidelines:
+- Write in a professional journalistic style
+- Provide context and background information
+- Explain the significance and implications
+- Be factual and balanced
+- Do NOT make up specific quotes or statistics
+- Do NOT include any meta-commentary like "This article explains..."
+- Write as if continuing the original article naturally
+- Match the language of the input (Arabic or English)
+- Use paragraph breaks for readability`;
+
+export const expandArticleContent = async (title: string, excerpt: string, category: string): Promise<string> => {
+    try {
+        const response = await fetch('/api/gemini', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [
+                            { text: ARTICLE_EXPANSION_PROMPT },
+                            { text: `Category: ${category}\nHeadline: ${title}\nBrief: ${excerpt}\n\nWrite the expanded article content:` }
+                        ]
+                    }
+                ],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 2048,
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('Gemini Expansion Error:', errorData);
+            return ''; // Return empty on error, will fall back to original content
+        }
+
+        const data = await response.json() as GeminiResponse;
+        return data.text || '';
+
+    } catch (error: any) {
+        console.error('Article Expansion Error:', error);
+        return '';
+    }
+};
