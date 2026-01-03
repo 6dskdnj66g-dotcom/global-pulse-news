@@ -190,8 +190,21 @@ const Article: React.FC = () => {
         };
         saveArticleToDb(shareableArticle);
 
-        // Create clean shareable URL
-        const shareUrl = `${window.location.origin}/article/${shareId}`;
+        // Encode article data in URL as backup (for when Firestore is offline)
+        const articleData = {
+            t: article.title,
+            e: article.excerpt,
+            i: article.imageUrl,
+            a: article.author,
+            c: article.category,
+            s: article.source,
+            d: article.date,
+            u: article.sourceUrl
+        };
+        const encodedData = encodeURIComponent(JSON.stringify(articleData));
+
+        // Create share URL with both clean path AND encoded data backup
+        const shareUrl = `${window.location.origin}/article/${shareId}?data=${encodedData}`;
 
         // Cast navigator to any to satisfy TypeScript if the Share API types aren't available
         if ((navigator as any).share) {

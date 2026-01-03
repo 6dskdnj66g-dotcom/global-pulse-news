@@ -276,9 +276,21 @@ const Home: React.FC = () => {
                                                             // Generate unique hash ID and save article
                                                             const shareId = generateArticleId(item.title);
                                                             const shareableArticle = { ...item, id: shareId };
-                                                            await saveArticleToDb(shareableArticle);
+                                                            saveArticleToDb(shareableArticle);
 
-                                                            const shareUrl = `${window.location.origin}/article/${shareId}`;
+                                                            // Encode article data as backup (for when Firestore is offline)
+                                                            const articleData = {
+                                                                t: item.title,
+                                                                e: item.excerpt,
+                                                                i: item.imageUrl,
+                                                                a: item.author,
+                                                                c: item.category,
+                                                                s: item.source,
+                                                                d: item.date,
+                                                                u: item.sourceUrl
+                                                            };
+                                                            const encodedData = encodeURIComponent(JSON.stringify(articleData));
+                                                            const shareUrl = `${window.location.origin}/article/${shareId}?data=${encodedData}`;
 
                                                             // Try native share first (mobile)
                                                             if ((navigator as any).share) {
