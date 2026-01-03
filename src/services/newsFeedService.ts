@@ -84,6 +84,10 @@ const ALL_FEEDS = [
     { name: 'Harvard Health', url: 'https://www.health.harvard.edu/rss/staying-healthy.xml', category: 'Health' },
     { name: 'Psychology Today', url: 'https://www.psychologytoday.com/us/feed/news', category: 'Health' },
     { name: 'New Scientist Health', url: 'https://www.newscientist.com/subject/health/feed/', category: 'Health' },
+    { name: 'CNN Health', url: 'http://rss.cnn.com/rss/cnn_health.rss', category: 'Health' },
+    { name: 'NYT Health', url: 'https://rss.nytimes.com/services/xml/rss/nyt/Health.xml', category: 'Health' },
+    { name: 'BBC Health', url: 'http://feeds.bbci.co.uk/news/health/rss.xml', category: 'Health' },
+    { name: 'NPR Health', url: 'https://feeds.npr.org/1128/rss.xml', category: 'Health' },
 
     // ===== ECONOMY =====
     { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', category: 'Economy' },

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
 import { saveArticleToDb } from '../services/articleService';
+import { translateToArabic } from '../services/translationService';
 import { ArrowRight, Share2, Clock, Globe } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -16,6 +17,7 @@ const Home: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
+    const [translatedArticles, setTranslatedArticles] = useState<Article[]>([]);
 
     const isRtl = i18n.dir() === 'rtl';
 
@@ -68,9 +70,39 @@ const Home: React.FC = () => {
         setLoadingMore(false);
     };
 
+    // Translate articles when language is Arabic
+    useEffect(() => {
+        const translateArticles = async () => {
+            if (i18n.language === 'ar' && articles.length > 0) {
+                const translated = await Promise.all(
+                    articles.map(async (article) => {
+                        const [translatedTitle, translatedExcerpt] = await Promise.all([
+                            translateToArabic(article.title),
+                            translateToArabic(article.excerpt)
+                        ]);
+                        return {
+                            ...article,
+                            title: translatedTitle,
+                            excerpt: translatedExcerpt
+                        };
+                    })
+                );
+                setTranslatedArticles(translated);
+            } else {
+                setTranslatedArticles([]);
+            }
+        };
+        translateArticles();
+    }, [i18n.language, articles]);
+
+    // Use translated articles if available, otherwise use original
+    const displayArticles = i18n.language === 'ar' && translatedArticles.length > 0
+        ? translatedArticles
+        : articles;
+
     const filteredArticles = activeCategory === 'All'
-        ? articles
-        : articles.filter(a => a.category.toLowerCase() === activeCategory.toLowerCase());
+        ? displayArticles
+        : displayArticles.filter(a => a.category.toLowerCase() === activeCategory.toLowerCase());
 
     return (
         <Layout>
