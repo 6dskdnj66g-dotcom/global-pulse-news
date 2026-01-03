@@ -149,8 +149,24 @@ const Article: React.FC = () => {
 
     const keyPoints = getKeyPoints();
 
-    const handleShare = () => {
+    const handleShare = async () => {
         const url = window.location.href;
+        const text = `Check out this article: ${article.title}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: article.title,
+                    text: article.excerpt,
+                    url: url,
+                });
+                return; // Shared successfully
+            } catch (error) {
+                console.log('Error sharing:', error);
+                // Fallback to clipboard
+            }
+        }
+
         navigator.clipboard.writeText(url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -278,12 +294,28 @@ const Article: React.FC = () => {
                                 <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
                                     {article.excerpt}
                                 </p>
-                                <p className="mb-6 opacity-90">
-                                    {t('article.body_placeholder', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')}
-                                </p>
-                                <p className="mb-6 opacity-80 blur-[0.5px]">
-                                    {t('article.body_placeholder_2', 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')}
-                                </p>
+
+                                {article.content ? (
+                                    <div className="space-y-6">
+                                        {/* Display content, handling both HTML mock data and plain text API data */}
+                                        {article.content.split('\n').map((paragraph, idx) => (
+                                            paragraph.trim() && (
+                                                <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
+                                            )
+                                        ))}
+                                        {article.content.includes('[+') && (
+                                            <p className="italic opacity-70 border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-r-lg">
+                                                {t('article.preview_only', 'This is a preview of the full article.')}
+                                            </p>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        <p className="opacity-80">
+                                            {t('article.read_full_prompt', 'Read the full story at the source below.')}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Fade Out Effect */}
@@ -327,7 +359,7 @@ const Article: React.FC = () => {
 
             {/* Sticky Audio Player */}
             <AudioPlayer
-                text={article.excerpt + " " + t('article.body_placeholder')}
+                text={article.excerpt + " " + (article.content || "").replace(/<[^>]+>/g, ' ')}
                 title={article.title}
                 lang={i18n.language}
             />

@@ -44,10 +44,13 @@ export const fetchNews = async (category?: string): Promise<Article[]> => {
             id: index.toString(), // NewsAPI doesn't allow robust IDs, using index for now
             title: item.title,
             excerpt: item.description || '',
+            content: item.content || undefined,
             category: category ? (category.charAt(0).toUpperCase() + category.slice(1)) as any : 'General',
             imageUrl: item.urlToImage || 'https://via.placeholder.com/600x400?text=No+Image', // Fallback image
             date: new Date(item.publishedAt).toLocaleDateString(),
-            author: item.author || 'Unknown'
+            author: item.author || 'Unknown',
+            source: item.source.name,
+            sourceUrl: item.url
         }));
     } catch (error) {
         console.error('Failed to fetch news:', error);
