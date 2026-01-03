@@ -150,13 +150,14 @@ export const fetchNewsByCategory = async (category: string): Promise<Article[]> 
     const articles: Article[] = [];
     const categoryFeeds = ALL_FEEDS.filter(f => f.category.toLowerCase() === category.toLowerCase());
 
-    for (const feed of categoryFeeds.slice(0, 3)) {
+    // Use up to 8 feeds per category for more variety and fresher content
+    for (const feed of categoryFeeds.slice(0, 8)) {
         try {
             const response = await fetch(`${RSS_TO_JSON}${encodeURIComponent(feed.url)}`);
             const data = await response.json();
 
             if (data.status === 'ok' && data.items?.length > 0) {
-                const items = data.items.slice(0, 4);
+                const items = data.items.slice(0, 5);
                 items.forEach((item: any, index: number) => {
                     articles.push({
                         id: `cat-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 5)}`,
