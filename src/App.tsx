@@ -7,6 +7,7 @@ import SignupPage from './pages/Signup';
 import PrivacyPage from './pages/Privacy';
 import TermsPage from './pages/Terms';
 import NotFound from './pages/NotFound';
+import SavedArticles from './pages/SavedArticles';
 import ScrollToTop from './components/layout/ScrollToTop';
 import { AuthProvider } from './context/AuthContext';
 
@@ -18,6 +19,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/article/:id" element={<ArticlePage />} />
+                    <Route path="/saved" element={<SavedArticles />} />
                     <Route path="/category/:category" element={<CategoryPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/signup" element={<SignupPage />} />

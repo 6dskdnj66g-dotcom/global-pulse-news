@@ -2,24 +2,37 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Article } from '../data/mockData';
-import { fetchBreakingNews } from '../services/newsApi';
+import { fetchBreakingNews, TickerItem } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
 import { saveArticleToDb } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
-import { ArrowRight, Share2, Clock } from 'lucide-react';
+import { ArrowRight, Share2, Clock, Bookmark, Globe } from 'lucide-react';
+import { useSavedArticles } from '../hooks/useSavedArticles';
 
 const Home: React.FC = () => {
     const { t, i18n } = useTranslation();
     const [articles, setArticles] = useState<Article[]>([]);
-    const [breakingNews, setBreakingNews] = useState<string[]>([]);
+    const [breakingNews, setBreakingNews] = useState<TickerItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
     const [translatedArticles, setTranslatedArticles] = useState<Article[]>([]);
+    const { isSaved, toggleSave } = useSavedArticles();
+    const [currentBreakingIndex, setCurrentBreakingIndex] = useState(0);
 
     const isRtl = i18n.dir() === 'rtl';
+
+    // Cycle breaking news
+    useEffect(() => {
+        if (breakingNews.length > 0) {
+            const interval = setInterval(() => {
+                setCurrentBreakingIndex(prev => (prev + 1) % breakingNews.length);
+            }, 5000);
+            return () => clearInterval(interval);
+        }
+    }, [breakingNews]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -33,7 +46,7 @@ const Home: React.FC = () => {
             // Auto-save all articles to DB for direct link support
             realArticles.forEach(article => saveArticleToDb(article));
 
-            // Set breaking news headlines (no market data)
+            // Set breaking news headlines
             setBreakingNews(tickerData);
             setLoading(false);
         };
@@ -138,10 +151,26 @@ const Home: React.FC = () => {
                                 🔴 {t('common.breaking')}
                             </div>
 
-                            <div className="flex-1 text-center md:text-left overflow-hidden">
-                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 line-clamp-2 md:line-clamp-1">
-                                    {breakingNews[0] || 'Loading breaking news...'}
-                                </p>
+                            <div className="flex-1 text-center md:text-left overflow-hidden min-h-[40px] md:min-h-[24px] flex items-center justify-center md:justify-start">
+                                <a
+                                    key={currentBreakingIndex}
+                                    href={breakingNews[currentBreakingIndex]?.url || '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm font-medium text-slate-700 dark:text-slate-200 line-clamp-2 md:line-clamp-1 hover:text-indigo-500 hover:underline transition-all animate-fade-in"
+                                >
+                                    {breakingNews[currentBreakingIndex]?.title || t('common.loading_news', 'Loading breaking news...')}
+                                </a>
+                            </div>
+
+                            {/* Ticker Indicators */}
+                            <div className="hidden md:flex gap-1">
+                                {breakingNews.map((_, idx) => (
+                                    <span
+                                        key={idx}
+                                        className={`block w-1.5 h-1.5 rounded-full transition-colors ${idx === currentBreakingIndex ? 'bg-red-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+                                    />
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -238,48 +267,65 @@ const Home: React.FC = () => {
                                                     {t('home.read_more')}
                                                     <ArrowRight size={14} className={isRtl ? 'rotate-180' : ''} />
                                                 </span>
-                                                <button
-                                                    onClick={async (e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        // Save the article to Firestore first
-                                                        await saveArticleToDb(item);
-                                                        const shareUrl = `${window.location.origin}/article/${item.id}`;
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={async (e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            // Save the article to Firestore first
+                                                            await saveArticleToDb(item);
+                                                            const shareUrl = `${window.location.origin}/article/${item.id}`;
 
-                                                        // Try native share first (mobile)
-                                                        if (navigator.share) {
-                                                            try {
-                                                                await navigator.share({
-                                                                    title: item.title,
-                                                                    text: item.excerpt?.substring(0, 100) + '...',
-                                                                    url: shareUrl
-                                                                });
-                                                                return;
-                                                            } catch (err) {
-                                                                // User cancelled or error
+                                                            // Try native share first (mobile)
+                                                            if (navigator.share) {
+                                                                try {
+                                                                    await navigator.share({
+                                                                        title: item.title,
+                                                                        text: item.excerpt?.substring(0, 100) + '...',
+                                                                        url: shareUrl
+                                                                    });
+                                                                    return;
+                                                                } catch (err) {
+                                                                    // User cancelled or error
+                                                                }
                                                             }
-                                                        }
 
-                                                        // Fallback: copy to clipboard
-                                                        try {
-                                                            await navigator.clipboard.writeText(shareUrl);
-                                                            alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
-                                                        } catch (err) {
-                                                            // Fallback for older browsers
-                                                            const textArea = document.createElement('textarea');
-                                                            textArea.value = shareUrl;
-                                                            document.body.appendChild(textArea);
-                                                            textArea.select();
-                                                            document.execCommand('copy');
-                                                            document.body.removeChild(textArea);
-                                                            alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
-                                                        }
-                                                    }}
-                                                    className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                                                    aria-label="Share"
-                                                >
-                                                    <Share2 size={16} className="text-slate-400 hover:text-indigo-500 transition-colors" />
-                                                </button>
+                                                            // Fallback: copy to clipboard
+                                                            try {
+                                                                await navigator.clipboard.writeText(shareUrl);
+                                                                alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                                            } catch (err) {
+                                                                // Fallback for older browsers
+                                                                const textArea = document.createElement('textarea');
+                                                                textArea.value = shareUrl;
+                                                                document.body.appendChild(textArea);
+                                                                textArea.select();
+                                                                document.execCommand('copy');
+                                                                document.body.removeChild(textArea);
+                                                                alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                                            }
+                                                        }}
+                                                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                                        aria-label="Share"
+                                                    >
+                                                        <Share2 size={16} className="text-slate-400 hover:text-indigo-500 transition-colors" />
+                                                    </button>
+
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            toggleSave(item);
+                                                        }}
+                                                        className={`p-2 rounded-full transition-all duration-300 ${isSaved(item.id)
+                                                            ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400'
+                                                            : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-indigo-500'
+                                                            }`}
+                                                        aria-label="Save Article"
+                                                    >
+                                                        <Bookmark size={16} fill={isSaved(item.id) ? "currentColor" : "none"} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </article>

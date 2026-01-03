@@ -59,22 +59,30 @@ export const fetchNews = async (category?: string): Promise<Article[]> => {
     }
 };
 
-export const fetchBreakingNews = async (): Promise<string[]> => {
+export interface TickerItem {
+    title: string;
+    url?: string;
+}
+
+export const fetchBreakingNews = async (): Promise<TickerItem[]> => {
     if (!API_KEY) {
         return Promise.resolve([
-            "🔴 BREAKING: Major diplomatic summit begins today with world leaders gathering to discuss global security",
-            "🌍 WORLD: Historic peace agreement signed between nations after months of negotiations",
-            "⚡ URGENT: International humanitarian mission launched to assist disaster-affected regions",
-            "🔴 BREAKING: World Health Organization announces major breakthrough in disease prevention",
-            "🌐 GLOBAL: United Nations Security Council convenes emergency session on international crisis"
+            { title: "🔴 BREAKING: Major diplomatic summit begins today with world leaders gathering to discuss global security", url: "#" },
+            { title: "🌍 WORLD: Historic peace agreement signed between nations after months of negotiations", url: "#" },
+            { title: "⚡ URGENT: International humanitarian mission launched to assist disaster-affected regions", url: "#" },
+            { title: "🔴 BREAKING: World Health Organization announces major breakthrough in disease prevention", url: "#" },
+            { title: "🌐 GLOBAL: United Nations Security Council convenes emergency session on international crisis", url: "#" }
         ]);
     }
 
     try {
         const response = await fetch(`${BASE_URL}/top-headlines?language=en&apiKey=${API_KEY}`);
         const data: NewsResponse = await response.json();
-        return data.articles.slice(0, 5).map(a => a.title);
+        return data.articles.slice(0, 5).map(a => ({
+            title: a.title,
+            url: a.url
+        }));
     } catch (error) {
-        return ["Breaking: API quota exceeded or error, showing placeholder ticker."];
+        return [{ title: "Breaking: API quota exceeded or error, showing placeholder ticker.", url: "#" }];
     }
 };

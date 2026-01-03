@@ -269,26 +269,48 @@ const Article: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* Full Article Content */}
-                        <div className="mb-8">
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-                                📰 {t('article.full_content', 'Full Article')}
-                            </h3>
+                        {/* Article Preview Content */}
+                        <div className="mb-8 relative">
                             <div
                                 className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
                                 style={{ fontSize: `${fontSize}px` }}
                             >
-                                <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3">
+                                <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
                                     {article.excerpt}
                                 </p>
-                                <p className="text-slate-600 dark:text-slate-400 mt-6 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg border-l-4 border-slate-300 dark:border-slate-600">
-                                    {t('article.content_note', 'This is a summary of the article. Click "Read Full Story" below to read the complete article from the original source.')}
+                                <p className="mb-6 opacity-90">
+                                    {t('article.body_placeholder', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')}
+                                </p>
+                                <p className="mb-6 opacity-80 blur-[0.5px]">
+                                    {t('article.body_placeholder_2', 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.')}
                                 </p>
                             </div>
+
+                            {/* Fade Out Effect */}
+                            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 dark:to-transparent flex items-end justify-center pb-8" />
+                        </div>
+
+                        {/* Premium Read Full Story Button */}
+                        <div className="flex flex-col items-center gap-6 mb-12 relative z-10">
+                            <a
+                                href={article.sourceUrl || '#'}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-lg font-bold rounded-full overflow-hidden shadow-2xl hover:scale-105 transition-all duration-300"
+                            >
+                                <span className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                <span className="relative flex items-center gap-3 group-hover:text-white transition-colors">
+                                    {t('article.read_full', 'Read Full Story')}
+                                    {isRtl ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
+                                </span>
+                            </a>
+                            <p className="text-xs text-slate-500 font-medium uppercase tracking-widest">
+                                {t('article.read_source', 'Continue reading at')} {article.source}
+                            </p>
                         </div>
 
                         {/* Action Bar */}
-                        <div className="mt-12 pt-8 border-t border-slate-200 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div className="pt-8 border-t border-slate-200 dark:border-slate-700/50 flex flex-col md:flex-row items-center justify-between gap-6">
                             <div className="flex gap-4">
                                 <button
                                     onClick={handleShare}
@@ -298,16 +320,6 @@ const Article: React.FC = () => {
                                     {copied ? t('article.copied', 'Copied!') : t('article.share', 'Share Article')}
                                 </button>
                             </div>
-
-                            <a
-                                href={article.sourceUrl || '#'}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn-3d flex items-center gap-3 px-8 py-4 text-lg w-full md:w-auto justify-center"
-                            >
-                                {t('article.read_full', 'Read Full Story')}
-                                {isRtl ? <ArrowLeft size={20} /> : <ArrowRight size={20} />}
-                            </a>
                         </div>
                     </div>
                 </div>
