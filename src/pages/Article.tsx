@@ -8,7 +8,7 @@ import SEO from '../components/common/SEO';
 import AudioPlayer from '../components/article/AudioPlayer';
 import ShareCard from '../components/article/ShareCard';
 
-import { saveArticleToDb, getArticleFromDb } from '../services/articleService';
+import { saveArticleToDb, getArticleFromDb, generateArticleId } from '../services/articleService';
 import { expandArticleContent } from '../services/geminiService';
 
 const Article: React.FC = () => {
@@ -180,20 +180,18 @@ const Article: React.FC = () => {
     const keyPoints = getKeyPoints();
 
     const handleShare = async () => {
-        // Encode article data in URL so recipients can view the article
-        const articleData = {
-            t: article.title,
-            e: article.excerpt,
-            i: article.imageUrl,
-            a: article.author,
-            c: article.category,
-            s: article.source,
-            d: article.date,
-            u: article.sourceUrl
+        // Generate a unique hash ID for this article based on its title
+        const shareId = generateArticleId(article.title);
+
+        // Save article to Firestore with the hash ID for recipient access
+        const shareableArticle = {
+            ...article,
+            id: shareId // Override the original ID with the hash ID
         };
-        const encodedData = encodeURIComponent(JSON.stringify(articleData));
-        const baseUrl = window.location.origin + window.location.pathname;
-        const shareUrl = `${baseUrl}?data=${encodedData}`;
+        saveArticleToDb(shareableArticle);
+
+        // Create clean shareable URL
+        const shareUrl = `${window.location.origin}/article/${shareId}`;
 
         // Cast navigator to any to satisfy TypeScript if the Share API types aren't available
         if ((navigator as any).share) {

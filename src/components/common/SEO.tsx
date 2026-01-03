@@ -13,7 +13,7 @@ interface SEOProps {
 const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData?: any }> = ({
     title,
     description,
-    image = 'https://global-pulse-news.vercel.app/og-image.jpg',
+    image = 'https://global-pulse-news.vercel.app/og-image.png',
     type = 'website',
     keywords,
     schemaType = 'website',

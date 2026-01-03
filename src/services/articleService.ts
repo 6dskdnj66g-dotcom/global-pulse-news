@@ -5,6 +5,22 @@ import { Article } from '../data/mockData';
 const COLLECTION_NAME = 'articles';
 
 /**
+ * Generates a unique short ID for an article based on its title.
+ * Uses a simple hash function to create a 8-character alphanumeric ID.
+ */
+export const generateArticleId = (title: string): string => {
+    let hash = 0;
+    for (let i = 0; i < title.length; i++) {
+        const char = title.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32-bit integer
+    }
+    // Convert to base36 (alphanumeric) and take 8 characters
+    const id = Math.abs(hash).toString(36).substring(0, 8);
+    return id.padEnd(8, '0'); // Ensure 8 characters
+};
+
+/**
  * Saves an article to Firestore.
  * This is designed to be a "fire and forget" operation in most cases.
  */
