@@ -249,22 +249,15 @@ const Home: React.FC = () => {
                                                     onClick={async (e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        const articleData = encodeURIComponent(JSON.stringify({
-                                                            t: item.title,
-                                                            e: item.excerpt,
-                                                            i: item.imageUrl,
-                                                            a: item.author,
-                                                            c: item.category,
-                                                            s: item.source,
-                                                            d: item.date,
-                                                            u: item.sourceUrl
-                                                        }));
-                                                        const shareUrl = window.location.origin + `/article/${item.id}?data=${articleData}`;
+                                                        // Save the article to Firestore first (in case it wasn't saved)
+                                                        await saveArticleToDb(item);
+                                                        // Use clean short URL
+                                                        const shareUrl = `${window.location.origin}/article/${item.id}`;
                                                         if (navigator.share) {
                                                             try {
                                                                 await navigator.share({
                                                                     title: item.title,
-                                                                    text: item.excerpt,
+                                                                    text: item.excerpt?.substring(0, 100) + '...',
                                                                     url: shareUrl
                                                                 });
                                                             } catch (err) {
