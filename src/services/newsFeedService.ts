@@ -78,6 +78,13 @@ const ALL_FEEDS = [
     { name: 'Healthline', url: 'https://www.healthline.com/rss/health-news', category: 'Health' },
     { name: 'National Geographic', url: 'https://www.nationalgeographic.com/rss/index.xml', category: 'Culture' },
 
+    // ===== RESEARCH & MEDICAL JOURNALS =====
+    { name: 'ScienceDaily Health', url: 'https://www.sciencedaily.com/rss/health_medicine.xml', category: 'Health' },
+    { name: 'Mayo Clinic', url: 'https://newsnetwork.mayoclinic.org/feed/', category: 'Health' },
+    { name: 'Harvard Health', url: 'https://www.health.harvard.edu/rss/staying-healthy.xml', category: 'Health' },
+    { name: 'Psychology Today', url: 'https://www.psychologytoday.com/us/feed/news', category: 'Health' },
+    { name: 'New Scientist Health', url: 'https://www.newscientist.com/subject/health/feed/', category: 'Health' },
+
     // ===== ECONOMY =====
     { name: 'CNBC', url: 'https://www.cnbc.com/id/100003114/device/rss/rss.html', category: 'Economy' },
     { name: 'Financial Times', url: 'https://www.ft.com/world?format=rss', category: 'Economy' },
