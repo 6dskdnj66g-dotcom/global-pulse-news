@@ -22,7 +22,7 @@ const Home: React.FC = () => {
         const loadData = async () => {
             setLoading(true);
             const [realArticles, tickerData] = await Promise.all([
-                fetchBatchRealNews(12),
+                fetchBatchRealNews(30),
                 fetchBreakingNews()
             ]);
             setArticles(realArticles);
