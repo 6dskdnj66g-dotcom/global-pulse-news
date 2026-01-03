@@ -8,7 +8,7 @@ import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
 import { saveArticleToDb } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
-import { ArrowRight, Share2, Clock, Bookmark, Globe } from 'lucide-react';
+import { ArrowRight, Share2, Clock, Bookmark } from 'lucide-react';
 import { useSavedArticles } from '../hooks/useSavedArticles';
 
 const Home: React.FC = () => {
