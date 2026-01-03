@@ -87,34 +87,4 @@ export const askGeminiAI = async (userMessage: string): Promise<string> => {
     }
 };
 
-// Fallback responses when API is unavailable
-const getSmartFallbackResponse = (query: string): string => {
-    const q = query.toLowerCase();
-    const isArabic = /[\u0600-\u06FF]/.test(query);
 
-    // Greetings
-    if (q.includes('hello') || q.includes('hi') || q.includes('مرحبا') || q.includes('السلام')) {
-        return isArabic
-            ? 'مرحباً! أنا Pulse AI، مساعدك الذكي. كيف يمكنني مساعدتك اليوم؟'
-            : 'Hello! I\'m Pulse AI, your intelligent assistant. How can I help you today?';
-    }
-
-    // Weather
-    if (q.includes('weather') || q.includes('طقس')) {
-        return isArabic
-            ? 'يمكنك رؤية الطقس الحالي في أعلى الصفحة. الطقس يتم تحديثه تلقائياً حسب موقعك!'
-            : 'You can see the current weather at the top of the page. It updates automatically based on your location!';
-    }
-
-    // News
-    if (q.includes('news') || q.includes('أخبار') || q.includes('خبر')) {
-        return isArabic
-            ? 'نقدم لك أحدث الأخبار من مصادر عالمية موثوقة مثل BBC, Reuters, Al Jazeera وغيرها. تصفح الأقسام المختلفة للمزيد!'
-            : 'We bring you the latest news from trusted global sources like BBC, Reuters, Al Jazeera and more. Browse different categories for more!';
-    }
-
-    // Default
-    return isArabic
-        ? 'شكراً لسؤالك! للحصول على إجابات أكثر تفصيلاً، يرجى التأكد من تفعيل مفتاح Gemini API. في الوقت الحالي، يمكنني مساعدتك في التنقل بين الأخبار والأقسام المختلفة.'
-        : 'Thanks for your question! For more detailed answers, please ensure the Gemini API key is configured. Currently, I can help you navigate news and different sections.';
-};
