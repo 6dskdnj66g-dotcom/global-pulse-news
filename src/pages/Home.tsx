@@ -6,7 +6,7 @@ import { fetchBreakingNews, TickerItem } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
-import { saveArticleToDb } from '../services/articleService';
+import { saveArticleToDb, generateArticleId } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
 import { ArrowRight, Share2, Clock, Bookmark } from 'lucide-react';
 import { useSavedArticles } from '../hooks/useSavedArticles';
@@ -272,14 +272,18 @@ const Home: React.FC = () => {
                                                         onClick={async (e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            // Save the article to Firestore first
-                                                            await saveArticleToDb(item);
-                                                            const shareUrl = `${window.location.origin}/article/${item.id}`;
+
+                                                            // Generate unique hash ID and save article
+                                                            const shareId = generateArticleId(item.title);
+                                                            const shareableArticle = { ...item, id: shareId };
+                                                            await saveArticleToDb(shareableArticle);
+
+                                                            const shareUrl = `${window.location.origin}/article/${shareId}`;
 
                                                             // Try native share first (mobile)
-                                                            if (navigator.share) {
+                                                            if ((navigator as any).share) {
                                                                 try {
-                                                                    await navigator.share({
+                                                                    await (navigator as any).share({
                                                                         title: item.title,
                                                                         text: item.excerpt?.substring(0, 100) + '...',
                                                                         url: shareUrl
