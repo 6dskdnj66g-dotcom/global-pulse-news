@@ -1,8 +1,8 @@
 // Gemini AI Service - Professional AI Chatbot Integration
 // Uses Google's Gemini API for intelligent responses
 
-// API key: prioritize environment variable for security, fallback for dev only
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyBwGcy_GS8EFec1ZMqPGdRosM6pRKn4St8';
+// API key: MUST be set via environment variable for security
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 interface GeminiResponse {

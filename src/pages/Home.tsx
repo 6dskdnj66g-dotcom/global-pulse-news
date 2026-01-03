@@ -104,7 +104,7 @@ const Home: React.FC = () => {
 
     return (
         <Layout>
-            <SEO title={t('nav.home')} />
+            <SEO title="News" />
 
             <div className="min-h-screen pb-20 overflow-hidden relative">
                 {/* Aurora Background Effects */}
