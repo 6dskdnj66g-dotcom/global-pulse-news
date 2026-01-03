@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" }); // Fallback to widely available v1.0 model
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" }); // Use lite version to avoid quota limits
 
         // Determine if it's a chat history or single prompt
         // The frontend sends `contents` array which is compatible with generateContent
