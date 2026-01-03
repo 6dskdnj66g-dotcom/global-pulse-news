@@ -285,42 +285,36 @@ const Article: React.FC = () => {
                             </ul>
                         </div>
 
-                        {/* Article Preview Content */}
-                        <div className="mb-8 relative">
-                            <div
-                                className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
-                                style={{ fontSize: `${fontSize}px` }}
-                            >
-                                <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
-                                    {article.excerpt}
-                                </p>
-
-                                {article.content ? (
-                                    <div className="space-y-6">
-                                        {/* Display content, handling both HTML mock data and plain text API data */}
-                                        {article.content.split('\n').map((paragraph, idx) => (
-                                            paragraph.trim() && (
-                                                <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
-                                            )
-                                        ))}
-                                        {article.content.includes('[+') && (
-                                            <p className="italic opacity-70 border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-r-lg">
-                                                {t('article.preview_only', 'This is a preview of the full article.')}
-                                            </p>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="space-y-6">
-                                        <p className="opacity-80">
-                                            {t('article.read_full_prompt', 'Read the full story at the source below.')}
+                        {/* Article Preview Content - Only show if we have real content or if summary didn't cover it */
+                            article.content && (
+                                <div className="mb-8 relative">
+                                    <div
+                                        className="prose prose-lg dark:prose-invert max-w-none font-sans leading-loose text-slate-800 dark:text-slate-300 transition-all duration-300"
+                                        style={{ fontSize: `${fontSize}px` }}
+                                    >
+                                        <p className="first-letter:text-5xl first-letter:font-bold first-letter:text-indigo-500 first-letter:float-left first-letter:mr-3 mb-6">
+                                            {article.excerpt}
                                         </p>
-                                    </div>
-                                )}
-                            </div>
 
-                            {/* Fade Out Effect */}
-                            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 dark:to-transparent flex items-end justify-center pb-8" />
-                        </div>
+                                        <div className="space-y-6">
+                                            {/* Display content */}
+                                            {article.content.split('\n').map((paragraph, idx) => (
+                                                paragraph.trim() && (
+                                                    <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
+                                                )
+                                            ))}
+                                            {article.content.includes('[+') && (
+                                                <p className="italic opacity-70 border-l-4 border-indigo-500 pl-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-r-lg">
+                                                    {t('article.preview_only', 'This is a preview of the full article.')}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Fade Out Effect */}
+                                    <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 dark:to-transparent flex items-end justify-center pb-8" />
+                                </div>
+                            )}
 
                         {/* Premium Read Full Story Button */}
                         <div className="flex flex-col items-center gap-6 mb-12 relative z-10">
