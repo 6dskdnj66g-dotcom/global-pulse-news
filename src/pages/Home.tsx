@@ -123,7 +123,7 @@ const Home: React.FC = () => {
 
                             <h1 className="text-6xl md:text-8xl font-display font-bold mb-8 leading-tight">
                                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-indigo-600 to-purple-600 dark:from-white dark:via-indigo-400 dark:to-purple-400 text-glow">
-                                    Global Pulse
+                                    {isRtl ? 'النبض العالمي' : 'Global Pulse'}
                                 </span>
                             </h1>
 

@@ -12,7 +12,7 @@ const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const location = useLocation();
     const { user, logout } = useAuth();
 
@@ -106,7 +106,7 @@ const Header: React.FC = () => {
                             {t('app.title')}
                         </h1>
                         <div className="mt-2 text-[10px] md:text-xs font-sans uppercase tracking-[0.2em] opacity-60 border-t border-b border-black/10 dark:border-white/10 py-1 inline-block px-4">
-                            Est. 2025 • Daily Edition
+                            {i18n.language === 'ar' ? 'تأسس 2025 • الإصدار اليومي' : 'Est. 2025 • Daily Edition'}
                         </div>
                     </Link>
                 </div>

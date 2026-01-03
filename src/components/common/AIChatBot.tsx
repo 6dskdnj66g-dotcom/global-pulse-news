@@ -104,7 +104,9 @@ const AIChatBot: React.FC = () => {
                             <h3 className="font-bold flex items-center gap-2">
                                 Pulse AI <Sparkles size={14} className="text-yellow-300" />
                             </h3>
-                            <p className="text-[10px] opacity-80 uppercase tracking-widest">Smart News Assistant</p>
+                            <p className="text-[10px] opacity-80 uppercase tracking-widest">
+                                {isRtl ? 'مساعد الأخبار الذكي' : 'Smart News Assistant'}
+                            </p>
                         </div>
                     </div>
                     <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">

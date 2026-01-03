@@ -9,7 +9,7 @@ import SEO from '../components/common/SEO';
 
 const CategoryPage: React.FC = () => {
     const { category } = useParams<{ category: string }>();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [articles, setArticles] = useState<Article[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -48,7 +48,9 @@ const CategoryPage: React.FC = () => {
                         {displayTitle}
                     </h1>
                     <p className="text-slate-500">
-                        Live updates from {category} - Powered by global news agencies
+                        {i18n.language === 'ar'
+                            ? `تحديثات مباشرة من قسم ${displayTitle} - مدعوم من وكالات الأنباء العالمية`
+                            : `Live updates from ${category} - Powered by global news agencies`}
                     </p>
                 </div>
 
