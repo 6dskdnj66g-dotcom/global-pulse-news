@@ -58,7 +58,9 @@ export const askGeminiAI = async (userMessage: string): Promise<string> => {
             const errorMessage = errorData.error || response.statusText;
             console.error('Gemini API Error Details:', errorData);
 
-            if (response.status === 500) return `⚠️ Server Error: Please try again later.`;
+            if (response.status === 500) {
+                return `⚠️ Server Error: ${errorData.details || errorData.error || 'Please try again later'}`;
+            }
             if (response.status === 429) return `⚠️ Rate limit exceeded. Try again later.`;
 
             throw new Error(`API Request Failed: ${response.status} ${errorMessage}`);

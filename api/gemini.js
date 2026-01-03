@@ -49,8 +49,8 @@ export default async function handler(req, res) {
     } catch (error) {
         console.error('Error generating content:', error);
         return res.status(500).json({
-            error: 'Failed to generate content',
-            details: error.message
+            error: error.message || 'Failed to generate content',
+            details: error.toString()
         });
     }
 }
