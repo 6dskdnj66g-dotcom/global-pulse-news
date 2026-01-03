@@ -36,7 +36,7 @@ You are integrated into a news website called "Global Pulse | النبض الع�
 export const askGeminiAI = async (userMessage: string): Promise<string> => {
     // Check if API key is available
     if (!GEMINI_API_KEY) {
-        return getSmartFallbackResponse(userMessage);
+        return "⚠️ API Key is missing. Please check configuration.";
     }
 
     try {
@@ -63,7 +63,15 @@ export const askGeminiAI = async (userMessage: string): Promise<string> => {
         });
 
         if (!response.ok) {
-            throw new Error('Gemini API request failed');
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.error?.message || response.statusText;
+            console.error('Gemini API Error Details:', errorData);
+
+            if (response.status === 400) return `⚠️ Error 400: Invalid Request. (${errorMessage})`;
+            if (response.status === 403) return `⚠️ Error 403: Origin/Referrer blocked or Key Invalid. Check API Key restrictions in Google AI Studio.`;
+            if (response.status === 429) return `⚠️ Error 429: Rate limit exceeded. Try again later.`;
+
+            throw new Error(`API Request Failed: ${response.status} ${errorMessage}`);
         }
 
         const data: GeminiResponse = await response.json();
@@ -72,10 +80,10 @@ export const askGeminiAI = async (userMessage: string): Promise<string> => {
             return data.candidates[0].content.parts[0].text;
         }
 
-        return getSmartFallbackResponse(userMessage);
-    } catch (error) {
-        console.error('Gemini AI Error:', error);
-        return getSmartFallbackResponse(userMessage);
+        return "⚠️ No content generated. Try rephrasing.";
+    } catch (error: any) {
+        console.error('Gemini AI Fetch Error:', error);
+        return `⚠️ Connection Error: ${error.message}`;
     }
 };
 
