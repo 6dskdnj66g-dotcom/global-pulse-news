@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // v1.2 force deploy
 import Home from './pages/Home';
 import ArticlePage from './pages/Article';
 import CategoryPage from './pages/Category';
