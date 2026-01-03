@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" }); // Using the same model as in frontend
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); // Use stable model for better free tier support
 
         // Determine if it's a chat history or single prompt
         // The frontend sends `contents` array which is compatible with generateContent
