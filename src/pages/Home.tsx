@@ -130,23 +130,18 @@ const Home: React.FC = () => {
                             </p>
                         </div>
 
-                        {/* Floating Glass Ticker */}
-                        <div className="glass-panel mx-auto max-w-4xl p-2 flex items-center gap-4 transform hover:scale-[1.02] transition-transform duration-500 relative overflow-hidden group">
+                        {/* Breaking News Ticker */}
+                        <div className="glass-panel mx-auto max-w-4xl p-3 md:p-2 flex flex-col md:flex-row items-center gap-3 md:gap-4 transform hover:scale-[1.02] transition-transform duration-500 relative overflow-hidden group">
                             <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                            <div className="bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-red-500/30 shrink-0 z-10">
-                                {t('common.breaking')}
+                            <div className="bg-red-500 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg shadow-red-500/30 shrink-0 z-10 animate-pulse">
+                                🔴 {t('common.breaking')}
                             </div>
 
-                            <div className="flex-1 overflow-hidden relative h-6 mask-gradient">
-                                <div className="absolute w-full animate-marquee whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200 flex items-center gap-8">
-                                    {breakingNews.map((item, i) => (
-                                        <span key={i} className="flex items-center gap-2">
-                                            <Globe size={12} className="text-indigo-500" />
-                                            {item}
-                                        </span>
-                                    ))}
-                                </div>
+                            <div className="flex-1 text-center md:text-left overflow-hidden">
+                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 line-clamp-2 md:line-clamp-1">
+                                    {breakingNews[0] || 'Loading breaking news...'}
+                                </p>
                             </div>
                         </div>
                     </div>
