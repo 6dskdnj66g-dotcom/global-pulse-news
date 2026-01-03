@@ -14,6 +14,7 @@ const Home: React.FC = () => {
     const [articles, setArticles] = useState<Article[]>([]);
     const [breakingNews, setBreakingNews] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
 
     const isRtl = i18n.dir() === 'rtl';
@@ -52,6 +53,20 @@ const Home: React.FC = () => {
         }, 30000); // 30 seconds - balanced for performance
         return () => clearInterval(interval);
     }, []);
+
+    // Load More Articles
+    const loadMore = async () => {
+        setLoadingMore(true);
+        const moreArticles = await fetchBatchRealNews(15);
+        // Filter out duplicates
+        setArticles(prev => {
+            const existingTitles = prev.map(a => a.title);
+            const newUnique = moreArticles.filter(a => !existingTitles.includes(a.title));
+            newUnique.forEach(article => saveArticleToDb(article));
+            return [...prev, ...newUnique];
+        });
+        setLoadingMore(false);
+    };
 
     const filteredArticles = activeCategory === 'All'
         ? articles
@@ -238,6 +253,29 @@ const Home: React.FC = () => {
                                     </article>
                                 </Link>
                             ))}
+                        </div>
+                    )}
+
+                    {/* Load More Button */}
+                    {!loading && filteredArticles.length > 0 && (
+                        <div className="flex justify-center mt-12">
+                            <button
+                                onClick={loadMore}
+                                disabled={loadingMore}
+                                className="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold text-lg rounded-full shadow-lg shadow-indigo-500/30 transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-wait"
+                            >
+                                {loadingMore ? (
+                                    <span className="flex items-center gap-2">
+                                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                        {isRtl ? 'جارٍ التحميل...' : 'Loading...'}
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-2">
+                                        {isRtl ? 'تحميل المزيد' : 'Load More'}
+                                        <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                                    </span>
+                                )}
+                            </button>
                         </div>
                     )}
 
