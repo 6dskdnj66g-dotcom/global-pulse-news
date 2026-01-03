@@ -1,8 +1,8 @@
 // Translation Service - Uses Gemini AI to translate content
 // Implements caching to avoid repeated API calls
 
-const GEMINI_API_KEY = 'AIzaSyBy3T3Obr_mYll-gwpE0OKPi0X2qB-N0yI';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-latest:generateContent';
+const GEMINI_API_KEY = 'AIzaSyBwGcy_GS8EFec1ZMqPGdRosM6pRKn4St8';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Simple in-memory cache for translations
 const translationCache: Record<string, string> = {};
