@@ -48,9 +48,22 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error('Error generating content:', error);
+
+        // Attempt to list models to help debug
+        let availableModels = 'Could not fetch models';
+        try {
+            const listResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+            const listData = await listResponse.json();
+            if (listData.models) {
+                availableModels = listData.models.map(m => m.name).join(', ');
+            }
+        } catch (e) {
+            availableModels = 'Failed to list models: ' + e.message;
+        }
+
         return res.status(500).json({
-            error: error.message || 'Failed to generate content',
-            details: error.toString()
+            error: 'Model Error',
+            details: `Failed to use model. Available models for your key: ${availableModels}. Original Error: ${error.message}`
         });
     }
 }
