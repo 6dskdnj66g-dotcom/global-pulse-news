@@ -155,7 +155,7 @@ const Footer: React.FC = () => {
 
                 {/* Copyright */}
                 <div className={`border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-sans uppercase tracking-widest text-slate-500 ${isRtl ? 'md:flex-row-reverse' : ''}`}>
-                    <span>© {currentYear} GLOBAL PULSE MEDIA. ALL RIGHTS RESERVED.</span>
+                    <span>© {currentYear} GLOBAL PULSE MEDIA. ALL RIGHTS RESERVED. v2.0</span>
                     <div className="flex gap-6">
                         <Link to="/" className="hover:text-white transition-colors">PRIVACY</Link>
                         <Link to="/" className="hover:text-white transition-colors">TERMS</Link>
