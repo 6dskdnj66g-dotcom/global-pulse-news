@@ -29,6 +29,11 @@ const CATEGORY_IMAGES: Record<string, string[]> = {
         'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80',
         'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?auto=format&fit=crop&q=80',
         'https://images.unsplash.com/photo-1499364615650-ec38552f4f34?auto=format&fit=crop&q=80'
+    ],
+    Health: [
+        'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80'
     ]
 };
 
@@ -63,6 +68,14 @@ const ALL_FEEDS = [
     { name: 'The Economist', url: 'https://www.economist.com/the-world-this-week/rss.xml', category: 'Economy' },
     { name: 'TIME Magazine', url: 'https://time.com/feed/', category: 'Culture' },
     { name: 'Forbes', url: 'https://www.forbes.com/business/feed/', category: 'Economy' },
+    { name: 'National Geographic', url: 'https://www.nationalgeographic.com/feed/', category: 'Culture' },
+
+    // ===== HEALTH & MEDICINE =====
+    { name: 'WHO News', url: 'https://www.who.int/rss-feeds/news-english.xml', category: 'Health' },
+    { name: 'Medical News Today', url: 'https://www.medicalnewstoday.com/newsfeeds/rss', category: 'Health' },
+    { name: 'WebMD', url: 'https://rssfeeds.webmd.com/rss/rss.aspx?RSSSource=RSS_PUBLIC', category: 'Health' },
+    { name: 'Health.com', url: 'https://www.health.com/syndication/rss', category: 'Health' },
+    { name: 'Healthline', url: 'https://www.healthline.com/rss/health-news', category: 'Health' },
     { name: 'National Geographic', url: 'https://www.nationalgeographic.com/rss/index.xml', category: 'Culture' },
 
     // ===== ECONOMY =====

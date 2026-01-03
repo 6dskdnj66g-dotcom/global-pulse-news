@@ -120,7 +120,7 @@ const Home: React.FC = () => {
 
                         {/* Glass Filters */}
                         <div className="flex gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 backdrop-blur-md rounded-full overflow-x-auto max-w-full">
-                            {['All', 'Politics', 'Economy', 'Technology', 'Sports'].map((cat) => (
+                            {['All', 'Politics', 'Economy', 'Technology', 'Sports', 'Health'].map((cat) => (
                                 <button
                                     key={cat}
                                     onClick={() => setActiveCategory(cat)}
@@ -241,32 +241,7 @@ const Home: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Modern Opinion Section */}
-                    <div className="mt-24 relative">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 rounded-3xl -z-10 blur-xl" />
-                        <h2 className="text-3xl font-display font-bold mb-12 text-center">
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
-                                {t('home.opinion_title')}
-                            </span>
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="glass-panel p-8 text-center group hover:bg-white/90 dark:hover:bg-slate-800/90 border-t-4 border-t-transparent hover:border-t-indigo-500 transition-all duration-500">
-                                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full mx-auto mb-6 p-1">
-                                        <div className="w-full h-full bg-slate-100 dark:bg-slate-900 rounded-full" />
-                                    </div>
-                                    <h4 className="font-bold text-xs uppercase tracking-widest text-indigo-500 mb-3 block">
-                                        {t('home.columnist_name')}
-                                    </h4>
-                                    <h3 className="font-display text-lg font-bold leading-tight mb-4 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                                        "The future of global economics lies in decentralized autonomous organizations..."
-                                    </h3>
-                                    <TrendingUp size={20} className="mx-auto text-slate-300 group-hover:text-indigo-500 transition-colors duration-500" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    {/* Opinion Section - Coming Soon */}
                 </main>
             </div>
         </Layout>

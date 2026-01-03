@@ -6,6 +6,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import SearchOverlay from '../common/SearchOverlay';
+import { getWeatherByLocation } from '../../services/weatherService';
 
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +21,7 @@ const Header: React.FC = () => {
         { key: 'economy', path: '/category/economy' },
         { key: 'technology', path: '/category/technology' },
         { key: 'sports', path: '/category/sports' },
+        { key: 'health', path: '/category/health' },
     ];
 
     // Handle scroll effect
@@ -37,18 +39,13 @@ const Header: React.FC = () => {
     }, [location]);
 
     // Weather State
-    const [weather, setWeather] = useState<{ temp: number } | null>(null);
+    const [weather, setWeather] = useState<{ temp: number; icon: string } | null>(null);
 
     useEffect(() => {
-        // Fetch Weather (Riyadh/Global Default)
-        fetch('https://api.open-meteo.com/v1/forecast?latitude=24.7136&longitude=46.6753&current_weather=true')
-            .then(res => res.json())
-            .then(data => {
-                if (data.current_weather) {
-                    setWeather({ temp: Math.round(data.current_weather.temperature) });
-                }
-            })
-            .catch(err => console.error("Weather fetch failed", err));
+        // Fetch Weather based on user location
+        getWeatherByLocation().then(data => {
+            setWeather({ temp: data.temperature, icon: data.icon });
+        });
     }, []);
 
     const dateString = new Date().toLocaleDateString(t('locale') === 'ar' ? 'ar-SA' : 'en-US', {
@@ -74,9 +71,8 @@ const Header: React.FC = () => {
                         {/* Weather Widget (New) */}
                         {weather && (
                             <div className="flex items-center gap-1 opacity-80 border-s border-border/50 ps-4">
-                                <span className="text-yellow-500">☀</span>
+                                <span>{weather.icon}</span>
                                 <span>{weather.temp}°C</span>
-                                <span className="hidden sm:inline text-[9px] opacity-60 ms-1">RIYADH</span>
                             </div>
                         )}
                     </div>
@@ -157,8 +153,8 @@ const Header: React.FC = () => {
                             <Link
                                 to="/"
                                 className={`block text-lg font-bold px-4 py-2 rounded-lg transition-all ${location.pathname === '/'
-                                        ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                    ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                    : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
                                     }`}
                                 onClick={() => setIsMenuOpen(false)}
                             >
@@ -169,8 +165,8 @@ const Header: React.FC = () => {
                                     key={item.key}
                                     to={item.path}
                                     className={`block text-lg font-bold px-4 py-2 rounded-lg transition-all ${location.pathname === item.path
-                                            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                            : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
+                                        ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                                        : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300'
                                         }`}
                                     onClick={() => setIsMenuOpen(false)}
                                 >
