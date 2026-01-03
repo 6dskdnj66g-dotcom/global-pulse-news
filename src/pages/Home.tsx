@@ -8,7 +8,7 @@ import SEO from '../components/common/SEO';
 import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
 import { saveArticleToDb } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
-import { ArrowRight, Share2, Clock, Globe } from 'lucide-react';
+import { ArrowRight, Share2, Clock } from 'lucide-react';
 
 const Home: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -242,10 +242,11 @@ const Home: React.FC = () => {
                                                     onClick={async (e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        // Save the article to Firestore first (in case it wasn't saved)
+                                                        // Save the article to Firestore first
                                                         await saveArticleToDb(item);
-                                                        // Use clean short URL
                                                         const shareUrl = `${window.location.origin}/article/${item.id}`;
+
+                                                        // Try native share first (mobile)
                                                         if (navigator.share) {
                                                             try {
                                                                 await navigator.share({
@@ -253,12 +254,25 @@ const Home: React.FC = () => {
                                                                     text: item.excerpt?.substring(0, 100) + '...',
                                                                     url: shareUrl
                                                                 });
+                                                                return;
                                                             } catch (err) {
-                                                                console.log('Share cancelled');
+                                                                // User cancelled or error
                                                             }
-                                                        } else {
-                                                            navigator.clipboard.writeText(shareUrl);
-                                                            alert(t('common.link_copied', 'Link copied!'));
+                                                        }
+
+                                                        // Fallback: copy to clipboard
+                                                        try {
+                                                            await navigator.clipboard.writeText(shareUrl);
+                                                            alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                                        } catch (err) {
+                                                            // Fallback for older browsers
+                                                            const textArea = document.createElement('textarea');
+                                                            textArea.value = shareUrl;
+                                                            document.body.appendChild(textArea);
+                                                            textArea.select();
+                                                            document.execCommand('copy');
+                                                            document.body.removeChild(textArea);
+                                                            alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
                                                         }
                                                     }}
                                                     className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
