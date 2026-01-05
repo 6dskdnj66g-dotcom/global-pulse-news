@@ -229,6 +229,8 @@ const Home: React.FC = () => {
                                             <img
                                                 src={item.imageUrl}
                                                 alt={item.title}
+                                                width="400"
+                                                height="256"
                                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                 loading="lazy"
                                             />
