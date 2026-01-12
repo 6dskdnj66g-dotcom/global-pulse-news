@@ -13,7 +13,7 @@ interface SEOProps {
 const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData?: any }> = ({
     title,
     description,
-    image = 'https://global-pulse-news.vercel.app/og-image.png',
+    image = 'https://globalpulse.social/og-image.png',
     type = 'website',
     keywords,
     schemaType = 'website',
@@ -37,8 +37,8 @@ const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData
         "@type": "NewsMediaOrganization",
         "name": "Global Pulse | النبض العالمي",
         "alternateName": ["النبض العالمي", "Global Pulse", "نبض الحياة"],
-        "url": "https://global-pulse-news.vercel.app",
-        "logo": "https://global-pulse-news.vercel.app/logo.png",
+        "url": "https://globalpulse.social",
+        "logo": "https://globalpulse.social/logo.png",
         "sameAs": [
             "https://global-pulse-news.netlify.app",
             "https://github.com/6dskdnj66g-dotcom/global-pulse-news"
@@ -59,7 +59,7 @@ const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData
             "author": [{
                 "@type": "Person",
                 "name": articleData.author || "Global Pulse Team",
-                "url": "https://global-pulse-news.vercel.app"
+                "url": "https://globalpulse.social"
             }],
             "publisher": baseSchema,
             "description": metaDescription
@@ -78,11 +78,11 @@ const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData
             <meta name="google-site-verification" content="Ek04_cbD0HckqttwLe--sJZbNZ0V4vz9PWTWVL9NhH4" />
 
             {/* Canonical URL */}
-            <link rel="canonical" href="https://global-pulse-news.vercel.app" />
+            <link rel="canonical" href="https://globalpulse.social" />
 
             {/* Alternate Languages */}
-            <link rel="alternate" hrefLang="ar" href="https://global-pulse-news.vercel.app/?lang=ar" />
-            <link rel="alternate" hrefLang="en" href="https://global-pulse-news.vercel.app/?lang=en" />
+            <link rel="alternate" hrefLang="ar" href="https://globalpulse.social/?lang=ar" />
+            <link rel="alternate" hrefLang="en" href="https://globalpulse.social/?lang=en" />
 
             {/* Open Graph */}
             <meta property="og:type" content={type} />
@@ -91,7 +91,7 @@ const SEO: React.FC<SEOProps & { schemaType?: 'article' | 'website', articleData
             <meta property="og:image" content={image} />
             <meta property="og:site_name" content={siteName} />
             <meta property="og:locale" content={currentLang === 'ar' ? 'ar_SA' : 'en_US'} />
-            <meta property="og:url" content="https://global-pulse-news.vercel.app" />
+            <meta property="og:url" content="https://globalpulse.social" />
 
             {/* Twitter */}
             <meta name="twitter:card" content="summary_large_image" />

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { Article } from '../data/mockData';
-import { fetchBreakingNews, TickerItem } from '../services/newsApi';
 import { useTranslation } from 'react-i18next';
 import SEO from '../components/common/SEO';
-import { fetchRealNews, fetchBatchRealNews } from '../services/newsFeedService';
+import { fetchRealNews, fetchBatchRealNews, fetchBreakingHeadlines, BreakingHeadline } from '../services/newsFeedService';
 import { saveArticleToDb, generateArticleId } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
 import { ArrowRight, Share2, Clock, Bookmark } from 'lucide-react';
@@ -14,7 +13,7 @@ import { useSavedArticles } from '../hooks/useSavedArticles';
 const Home: React.FC = () => {
     const { t, i18n } = useTranslation();
     const [articles, setArticles] = useState<Article[]>([]);
-    const [breakingNews, setBreakingNews] = useState<TickerItem[]>([]);
+    const [breakingNews, setBreakingNews] = useState<BreakingHeadline[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
@@ -39,7 +38,7 @@ const Home: React.FC = () => {
             setLoading(true);
             const [realArticles, tickerData] = await Promise.all([
                 fetchBatchRealNews(30),
-                fetchBreakingNews()
+                fetchBreakingHeadlines()
             ]);
             setArticles(realArticles);
 

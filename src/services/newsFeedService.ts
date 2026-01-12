@@ -213,3 +213,49 @@ export const fetchBatchRealNews = async (count: number = 12): Promise<Article[]>
     const results = await Promise.all(fetchPromises);
     return results.filter(a => a !== null && a !== undefined) as Article[];
 };
+
+// === BREAKING NEWS HEADLINES (Real RSS) ===
+export interface BreakingHeadline {
+    title: string;
+    url: string;
+    source: string;
+}
+
+const BREAKING_FEEDS = [
+    { name: 'BBC', url: 'http://feeds.bbci.co.uk/news/world/rss.xml' },
+    { name: 'Al Jazeera', url: 'https://www.aljazeera.com/xml/rss/all.xml' },
+    { name: 'CNN', url: 'http://rss.cnn.com/rss/edition_world.rss' },
+    { name: 'Reuters', url: 'https://www.reutersagency.com/feed/?taxonomy=best-topics&post_type=best' },
+];
+
+export const fetchBreakingHeadlines = async (): Promise<BreakingHeadline[]> => {
+    const headlines: BreakingHeadline[] = [];
+
+    // Fetch from 2 random feeds to avoid overloading
+    const shuffled = [...BREAKING_FEEDS].sort(() => Math.random() - 0.5).slice(0, 2);
+
+    const fetchPromises = shuffled.map(async (feed) => {
+        try {
+            const response = await fetch(`${RSS_TO_JSON}${encodeURIComponent(feed.url)}`);
+            const data = await response.json();
+
+            if (data.status === 'ok' && data.items?.length > 0) {
+                // Get the top 3 items from each feed
+                return data.items.slice(0, 3).map((item: any) => ({
+                    title: `🔴 ${feed.name}: ${item.title?.replace(/<[^>]*>/g, '') || 'Breaking News'}`,
+                    url: item.link || '#',
+                    source: feed.name
+                }));
+            }
+        } catch (error) {
+            console.error(`Breaking news fetch error for ${feed.name}:`, error);
+        }
+        return [];
+    });
+
+    const results = await Promise.all(fetchPromises);
+    results.forEach(items => headlines.push(...items));
+
+    // Shuffle and return top 5
+    return headlines.sort(() => Math.random() - 0.5).slice(0, 5);
+};

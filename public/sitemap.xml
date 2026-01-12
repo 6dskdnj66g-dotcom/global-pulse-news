@@ -2,44 +2,44 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <!-- Main Page -->
     <url>
-        <loc>https://global-pulse-news.vercel.app/</loc>
+        <loc>https://globalpulse.social/</loc>
         <lastmod>2024-03-24</lastmod>
         <changefreq>always</changefreq>
         <priority>1.0</priority>
     </url>
     <!-- Categories -->
     <url>
-        <loc>https://global-pulse-news.vercel.app/category/Politics</loc>
+        <loc>https://globalpulse.social/category/Politics</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://global-pulse-news.vercel.app/category/Economy</loc>
+        <loc>https://globalpulse.social/category/Economy</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://global-pulse-news.vercel.app/category/Technology</loc>
+        <loc>https://globalpulse.social/category/Technology</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://global-pulse-news.vercel.app/category/Sports</loc>
+        <loc>https://globalpulse.social/category/Sports</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://global-pulse-news.vercel.app/category/Culture</loc>
+        <loc>https://globalpulse.social/category/Culture</loc>
         <changefreq>hourly</changefreq>
         <priority>0.8</priority>
     </url>
     <!-- Login/Signup -->
     <url>
-        <loc>https://global-pulse-news.vercel.app/login</loc>
+        <loc>https://globalpulse.social/login</loc>
         <priority>0.5</priority>
     </url>
     <url>
-        <loc>https://global-pulse-news.vercel.app/signup</loc>
+        <loc>https://globalpulse.social/signup</loc>
         <priority>0.5</priority>
     </url>
 </urlset>
