@@ -31,7 +31,13 @@ You are integrated into a news website called "Global Pulse | النبض الع�
 
 export const askGeminiAI = async (userMessage: string): Promise<string> => {
     try {
-        const response = await fetch('/api/gemini', {
+        // In development (localhost), point to the live Vercel backend
+        // In production, use relative path
+        const apiUrl = import.meta.env.DEV
+            ? 'https://globalpulse.social/api/gemini'
+            : '/api/gemini';
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -95,9 +101,14 @@ Guidelines:
 - Match the language of the input (Arabic or English)
 - Use paragraph breaks for readability`;
 
+
 export const expandArticleContent = async (title: string, excerpt: string, category: string): Promise<string> => {
     try {
-        const response = await fetch('/api/gemini', {
+        const apiUrl = import.meta.env.DEV
+            ? 'https://globalpulse.social/api/gemini'
+            : '/api/gemini';
+
+        const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
