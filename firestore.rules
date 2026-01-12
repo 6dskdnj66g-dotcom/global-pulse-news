@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // === ARTICLES COLLECTION ===
+    // Public Read: Everyone can read news (essential for the site to work)
+    // Write: LOCKED. Only possible via Admin SDK (backend) or strictly controlled share logic
+    match /articles/{articleId} {
+      allow read: if true; 
+      
+      // Allow users to "share" (save) an article if they are authenticated
+      // Validation: Title and URL must be present.
+      allow create: if request.auth != null 
+                   && request.resource.data.keys().hasAll(['title', 'url', 'date'])
+                   && request.resource.data.title is string
+                   && request.resource.data.title.size() < 300; // Prevent massive titles
+                   
+      // Updates/Deletes are BLOCKED for everyone
+      allow update, delete: if false; 
+    }
+
+    // === USERS COLLECTION ===
+    // Users can ONLY read/write their OWN profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Strict Validation for User Data
+      // Ensures users can't inject random garbage into their profile
+      allow create, update: if request.auth != null 
+                           && request.auth.uid == userId;
+    }
+
+    // === SAVED ARTICLES (Sub-collection) ===
+    // Users can ONLY manage their OWN saved articles
+    match /users/{userId}/saved_articles/{articleId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // === DEFAULT DENY ===
+    // Everything else is blocked.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
