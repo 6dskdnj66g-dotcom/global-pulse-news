@@ -384,7 +384,7 @@ const Article: React.FC = () => {
                                     <div className="space-y-6">
                                         {article.content.split('\n').map((paragraph, idx) => (
                                             paragraph.trim() && (
-                                                <p key={idx} dangerouslySetInnerHTML={{ __html: paragraph.replace(/\[\+\d+ chars\]/, '') }} />
+                                                <p key={idx}>{paragraph.replace(/<[^>]*>/g, '').replace(/\[\+\d+ chars\]/, '')}</p>
                                             )
                                         ))}
                                     </div>

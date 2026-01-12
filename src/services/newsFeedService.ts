@@ -3,6 +3,38 @@ import { Article } from '../data/mockData';
 // Public RSS-to-JSON proxy
 const RSS_TO_JSON = 'https://api.rss2json.com/v1/api.json?rss_url=';
 
+// === CACHING FOR PERFORMANCE ===
+const CACHE_KEY = 'gp_news_cache_v2';
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+interface NewsCache {
+    articles: Article[];
+    timestamp: number;
+}
+
+const getFromCache = (): Article[] | null => {
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (!cached) return null;
+        const data: NewsCache = JSON.parse(cached);
+        if (Date.now() - data.timestamp < CACHE_TTL) {
+            return data.articles;
+        }
+    } catch {
+        // Cache read failed, continue without cache
+    }
+    return null;
+};
+
+const saveToCache = (articles: Article[]) => {
+    try {
+        const data: NewsCache = { articles, timestamp: Date.now() };
+        localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+    } catch {
+        // Cache write failed (quota exceeded, etc.)
+    }
+};
+
 // === PROFESSIONAL FALLBACK IMAGES BY CATEGORY ===
 const CATEGORY_IMAGES: Record<string, string[]> = {
     Politics: [
@@ -181,8 +213,27 @@ export const fetchNewsByCategory = async (category: string): Promise<Article[]> 
     return articles;
 };
 
-// === BATCH FETCH for fast loading ===
+// === BATCH FETCH for fast loading (with caching) ===
 export const fetchBatchRealNews = async (count: number = 12): Promise<Article[]> => {
+    // Check cache first for instant load
+    const cached = getFromCache();
+    if (cached && cached.length > 0) {
+        // Return cache immediately, but refresh in background
+        setTimeout(async () => {
+            const fresh = await fetchFreshNews(count);
+            if (fresh.length > 0) saveToCache(fresh);
+        }, 100);
+        return cached;
+    }
+
+    // No cache, fetch fresh
+    const articles = await fetchFreshNews(count);
+    saveToCache(articles);
+    return articles;
+};
+
+// Internal function to fetch fresh news (no caching logic)
+const fetchFreshNews = async (count: number): Promise<Article[]> => {
     const shuffledFeeds = [...ALL_FEEDS].sort(() => Math.random() - 0.5);
 
     const fetchPromises = shuffledFeeds.slice(0, Math.min(count, shuffledFeeds.length)).map(async (feed) => {
