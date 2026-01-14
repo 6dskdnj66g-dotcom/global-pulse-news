@@ -1,5 +1,10 @@
 
-const GEMINI_API_KEY = 'AIzaSyBy3T3Obr_mYll-gwpE0OKPi0X2qB-N0yI';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+if (!GEMINI_API_KEY) {
+    console.error('❌ Missing GEMINI_API_KEY environment variable.');
+    process.exit(1);
+}
 const MODELS_TO_TEST = [
     'gemini-1.5-pro',
     'gemini-pro-latest',
