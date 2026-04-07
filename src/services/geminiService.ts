@@ -27,7 +27,7 @@ Guidelines:
 You are integrated into a news website called "Global Pulse | النبض العالمي".`;
 
 // Direct Gemini API (used in DEV if VITE_GEMINI_API_KEY is set)
-const DIRECT_GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const DIRECT_GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
 const DEV_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
 const callGeminiDirect = async (contents: object[], generationConfig: object): Promise<string> => {

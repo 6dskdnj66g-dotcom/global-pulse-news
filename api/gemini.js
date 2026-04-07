@@ -52,8 +52,8 @@ export default async function handler(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Use gemini-2.0-flash as it is supported in the current v1beta API version
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        // Use gemini-1.5-flash-latest as a fallback since 2.0 returned quota 0
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
         const result = await model.generateContent({
             contents: contents,
