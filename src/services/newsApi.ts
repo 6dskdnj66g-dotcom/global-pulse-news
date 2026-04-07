@@ -1,8 +1,5 @@
 import { Article, mockArticles } from '../data/mockData';
 
-const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-const BASE_URL = 'https://newsapi.org/v2';
-
 export interface NewsResponse {
     status: string;
     totalResults: number;
@@ -19,25 +16,22 @@ export interface NewsResponse {
 }
 
 export const fetchNews = async (category?: string): Promise<Article[]> => {
-    // If no API key or in development without key, use mock data
-    if (!API_KEY) {
-        console.warn('No API Key found, using mock data');
-        if (category) {
-            return Promise.resolve(mockArticles.filter(a => a.category.toLowerCase() === category.toLowerCase()));
-        }
-        return Promise.resolve(mockArticles);
-    }
-
     try {
         const endpoint = category
-            ? `${BASE_URL}/top-headlines?category=${category}&language=en&apiKey=${API_KEY}`
-            : `${BASE_URL}/top-headlines?language=en&apiKey=${API_KEY}`;
+            ? `/api/news?category=${encodeURIComponent(category.toLowerCase())}`
+            : `/api/news`;
 
         const response = await fetch(endpoint);
+        
+        if (!response.ok) {
+            console.warn('API Error (Backend) or missing key, falling back to mock data');
+            throw new Error('API Error');
+        }
+
         const data: NewsResponse = await response.json();
 
         if (data.status !== 'ok') {
-            throw new Error('API Error');
+            throw new Error('NewsAPI Error Code');
         }
 
         return data.articles.map((item, index) => ({
@@ -53,8 +47,8 @@ export const fetchNews = async (category?: string): Promise<Article[]> => {
             sourceUrl: item.url
         }));
     } catch (error) {
-        console.error('Failed to fetch news:', error);
-        // Fallback to mock data on error
+        console.error('Failed to fetch news from backend API:', error);
+        // Fallback to mock data on error or if api/news key is missing
         if (category) {
             return mockArticles.filter(a => a.category.toLowerCase() === category.toLowerCase());
         }
@@ -68,24 +62,25 @@ export interface TickerItem {
 }
 
 export const fetchBreakingNews = async (): Promise<TickerItem[]> => {
-    if (!API_KEY) {
-        return Promise.resolve([
-            { title: "🔴 BREAKING: Major diplomatic summit begins today with world leaders gathering to discuss global security", url: "#" },
-            { title: "🌍 WORLD: Historic peace agreement signed between nations after months of negotiations", url: "#" },
-            { title: "⚡ URGENT: International humanitarian mission launched to assist disaster-affected regions", url: "#" },
-            { title: "🔴 BREAKING: World Health Organization announces major breakthrough in disease prevention", url: "#" },
-            { title: "🌐 GLOBAL: United Nations Security Council convenes emergency session on international crisis", url: "#" }
-        ]);
-    }
-
     try {
-        const response = await fetch(`${BASE_URL}/top-headlines?language=en&apiKey=${API_KEY}`);
+        const response = await fetch(`/api/news?breaking=true`);
+        
+        if (!response.ok) {
+            throw new Error('Upstream backend error');
+        }
+
         const data: NewsResponse = await response.json();
+
         return data.articles.slice(0, 5).map(a => ({
             title: a.title,
             url: a.url
         }));
     } catch (error) {
-        return [{ title: "Breaking: API quota exceeded or error, showing placeholder ticker.", url: "#" }];
+        console.warn('Backend/API error falling back to Breaking placeholder', error);
+        return [
+            { title: "🔴 BREAKING: Major diplomatic summit begins today with world leaders gathering to discuss global security", url: "#" },
+            { title: "🌍 WORLD: Historic peace agreement signed between nations after months of negotiations", url: "#" },
+            { title: "⚡ URGENT: International humanitarian mission launched to assist disaster-affected regions", url: "#" }
+        ];
     }
 };

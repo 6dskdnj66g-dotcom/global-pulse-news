@@ -1,17 +1,12 @@
-// Translation Service - Uses Gemini AI to translate content
+// Translation Service - Securly routed via Backend API
 // Implements caching to avoid repeated API calls
-
-// Gemini API key MUST be set via VITE_GEMINI_API_KEY environment variable
-// NEVER hardcode API keys - they will be leaked in the client bundle
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
 // Simple in-memory cache for translations
 const translationCache: Record<string, string> = {};
 
 export const translateToArabic = async (text: string): Promise<string> => {
     // Return from cache if available
-    const cacheKey = text.substring(0, 100); // Use first 100 chars as key
+    const cacheKey = text.substring(0, 100);
     if (translationCache[cacheKey]) {
         return translationCache[cacheKey];
     }
@@ -22,7 +17,8 @@ export const translateToArabic = async (text: string): Promise<string> => {
     }
 
     try {
-        const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+        // SECURITY FIX: Route through Backend to prevent exposing GEMINI_API_KEY
+        const response = await fetch('/api/gemini', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -41,11 +37,13 @@ export const translateToArabic = async (text: string): Promise<string> => {
 
         if (!response.ok) {
             console.warn('Translation API error:', response.status);
-            return text; // Return original on error
+            return text; // Fallback
         }
 
         const data = await response.json();
-        const translated = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        
+        // Match the backend API format ({ text: string })
+        const translated = data.text;
 
         if (translated) {
             // Remove quotes if they wrap the translation
@@ -56,22 +54,20 @@ export const translateToArabic = async (text: string): Promise<string> => {
 
         return text;
     } catch (error) {
-        console.warn('Translation error:', error);
+        console.warn('Translation secure routing error:', error);
         return text; // Return original on error
     }
 };
 
 // Batch translate multiple texts for efficiency
 export const batchTranslateToArabic = async (texts: string[]): Promise<string[]> => {
-    // Check which texts need translation
     const needsTranslation = texts.filter(t => !translationCache[t.substring(0, 100)]);
 
     if (needsTranslation.length === 0) {
-        // All cached
         return texts.map(t => translationCache[t.substring(0, 100)] || t);
     }
 
-    // For now, translate individually (could be optimized with batch API)
+    // Process concurrently
     const results = await Promise.all(texts.map(t => translateToArabic(t)));
     return results;
 };
