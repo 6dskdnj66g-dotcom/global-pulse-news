@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import SearchOverlay from '../common/SearchOverlay';
 import { getWeatherByLocation } from '../../services/weatherService';
 import { useSavedArticles } from '../../hooks/useSavedArticles';
+import InstallPwaPrompt from '../common/InstallPwaPrompt';
 
 const Header: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,6 +80,7 @@ const Header: React.FC = () => {
                         )}
                     </div>
                     <div className="flex items-center gap-4">
+                        <InstallPwaPrompt />
                         <LanguageSwitcher />
                         <ModeToggle />
 
