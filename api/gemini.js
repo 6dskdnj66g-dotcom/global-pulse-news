@@ -38,39 +38,48 @@ export default async function handler(req, res) {
     }
 
     const { contents, generationConfig } = req.body;
-    const apiKey = process.env.GEMINI_API_KEY;
+    
+    // BACKUP: Support both env variable naming conventions
+    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
     if (!apiKey) {
-        console.error('SERVER ERROR: GEMINI_API_KEY is not set');
-        return res.status(500).json({ error: 'Service temporarily unavailable' });
+        console.error('SERVER ERROR: API KEY is completely missing from environment variables');
+        return res.status(500).json({ 
+            error: 'Configuration Error', 
+            details: 'API Key is missing in Vercel settings.' 
+        });
     }
 
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Use a consistent model alias
+        // Fallback to flash-latest if 1.5 is deprecated
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const result = await model.generateContent({
             contents: contents,
             generationConfig: {
                 ...generationConfig,
-                maxOutputTokens: Math.min(generationConfig?.maxOutputTokens || 1024, 2048) // Cap tokens to prevent abuse
+                maxOutputTokens: Math.min(generationConfig?.maxOutputTokens || 1024, 2048)
             }
         });
 
         const response = await result.response;
+        // Verify response exists
+        if (!response) {
+            throw new Error("No response string received from Google AI.");
+        }
+        
         const text = response.text();
-
         return res.status(200).json({ text });
 
     } catch (error) {
-        console.error('Gemini API Error:', error.message); // Log full error internally
+        console.error('Gemini API Critical Error:', error); 
 
-        // === SECURE ERROR RESPONSE ===
-        // Do NOT leak stack traces or internal details to the client
+        // THE FIX: Exclude giant stack traces, but expose the CORE error condition
+        // e.g., "API key not valid", "User location is not supported"
         return res.status(500).json({
             error: 'AI content generation failed',
-            details: 'The service encountered an error. Please try again.'
+            details: error.message || 'Unknown upstream service error occurred.'
         });
     }
 }
