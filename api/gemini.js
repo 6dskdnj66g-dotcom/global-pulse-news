@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
-
 export default async function handler(req, res) {
     // CORS configuration
     const allowedOrigins = ['https://globalpulse.social', 'http://localhost:5173', 'http://localhost:3000'];

@@ -9,12 +9,16 @@
         "technology": "تكنولوجيا",
         "sports": "رياضة",
         "health": "صحة",
-        "culture": "ثقافة"
+        "culture": "ثقافة",
+        "saved": "المقالات المحفوظة"
     },
     "header": {
         "login": "تسجيل الدخول",
         "signup": "إنشاء حساب",
         "logout": "تسجيل الخروج",
+        "sign_out": "تسجيل الخروج",
+        "sign_in": "تسجيل الدخول",
+        "welcome": "أهلاً, {{name}}",
         "english": "English",
         "arabic": "العربية",
         "hello": "مرحباً، {{name}}"
@@ -51,7 +55,13 @@
         "link_copied": "تم نسخ الرابط!",
         "all": "الكل",
         "load_more": "تحميل المزيد",
-        "loading_more": "جارٍ التحميل..."
+        "loading_more": "جارٍ التحميل...",
+        "loading_news": "جارٍ تحميل الأخبار العاجلة...",
+        "no_results": "لا توجد نتائج لـ \"{{query}}\"",
+        "type_to_search": "اكتب للبدء في البحث...",
+        "searching_articles": "البحث في {{count}} مقال حقيقي",
+        "load_home_first": "قم بتحميل الصفحة الرئيسية أولاً لتفعيل البحث",
+        "suggested_topics": "مواضيع مقترحة"
     },
     "auth": {
         "signin_title": "تسجيل الدخول",
@@ -80,7 +90,8 @@
         "filter_technology": "تكنولوجيا",
         "filter_sports": "رياضة",
         "filter_culture": "ثقافة",
-        "filter_health": "صحة"
+        "filter_health": "صحة",
+        "read_more": "اقرأ المزيد"
     },
     "article": {
         "summary_title": "ملخص شامل",
@@ -90,7 +101,11 @@
         "date_label": "التاريخ",
         "external_link_title": "للقراءة الكاملة",
         "read_full": "قراءة المقال الكامل",
+        "read_source": "متابعة القراءة على",
+        "share": "مشاركة المقال",
         "copied": "تم نسخ الرابط!",
+        "ai_loading": "الذكاء الاصطناعي يكتب ملخصاً تفصيلياً...",
+        "ai_generated": "هذا الملخص أنشأه Pulse AI لمساعدتك على الفهم. اقرأ المصدر الأصلي للمعلومات الكاملة.",
         "context": {
             "politics": [
                 "يأتي هذا التطور في سياق التحولات الجيوسياسية العالمية المتسارعة.",

@@ -64,7 +64,7 @@ const Header: React.FC = () => {
                 {/* Top Tools Bar */}
                 <div className="container py-1 flex justify-between items-center text-[11px] font-sans tracking-tight uppercase border-b border-border/50">
                     <div className="flex items-center gap-4">
-                        <button className="hover:text-primary-accent transition-colors" onClick={() => setIsSearchOpen(true)}>
+                        <button className="hover:text-primary-accent transition-colors" onClick={() => setIsSearchOpen(true)} aria-label={t('common.search_title', 'Search')}>
                             <Search size={14} />
                         </button>
                         <div className="hidden sm:block opacity-60">
@@ -94,12 +94,12 @@ const Header: React.FC = () => {
 
                         {user ? (
                             <div className="flex items-center gap-3">
-                                <span className="hidden md:inline font-bold text-primary-accent">Hello, {user.name}</span>
-                                <button onClick={logout} className="hover:text-red-500 transition-colors font-bold">Log out</button>
+                                <span className="hidden md:inline font-bold text-primary-accent">{t('header.hello', { name: user.name })}</span>
+                                <button onClick={logout} className="hover:text-red-500 transition-colors font-bold">{t('header.logout')}</button>
                             </div>
                         ) : (
                             <Link to="/login" className="flex items-center gap-1 font-bold hover:text-primary-accent transition-colors">
-                                <User size={12} /> Log in
+                                <User size={12} /> {t('header.login')}
                             </Link>
                         )}
                     </div>
@@ -110,6 +110,7 @@ const Header: React.FC = () => {
                     <button
                         className="md:hidden absolute left-4 p-2"
                         onClick={() => setIsMenuOpen(true)}
+                        aria-label="Open menu"
                     >
                         <Menu size={24} />
                     </button>
@@ -156,7 +157,7 @@ const Header: React.FC = () => {
                             <span className="font-display font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
                                 {t('app.title')}
                             </span>
-                            <button onClick={() => setIsMenuOpen(false)} className="text-muted hover:text-foreground">
+                            <button onClick={() => setIsMenuOpen(false)} className="text-muted hover:text-foreground" aria-label="Close menu">
                                 <X size={24} />
                             </button>
                         </div>
@@ -211,14 +212,14 @@ const Header: React.FC = () => {
                         <div className="mt-auto p-4 bg-slate-100/50 dark:bg-slate-800/50 rounded-xl border border-white/5">
                             {user ? (
                                 <div>
-                                    <p className="font-bold mb-2 text-sm text-indigo-500">Welcome, {user.name}</p>
+                                    <p className="font-bold mb-2 text-sm text-indigo-500">{t('header.welcome', { name: user.name })}</p>
                                     <button onClick={logout} className="text-xs uppercase tracking-widest text-red-500 font-bold hover:text-red-400">
-                                        Sign Out
+                                        {t('header.sign_out')}
                                     </button>
                                 </div>
                             ) : (
                                 <Link to="/login" className="flex items-center justify-center gap-2 font-bold bg-indigo-500 text-white py-3 rounded-lg hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/20" onClick={() => setIsMenuOpen(false)}>
-                                    <User size={18} /> Sign In
+                                    <User size={18} /> {t('header.sign_in')}
                                 </Link>
                             )}
                         </div>

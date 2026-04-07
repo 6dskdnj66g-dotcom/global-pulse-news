@@ -15,7 +15,7 @@ const AIChatBot: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [input, setInput] = useState('');
     const { user } = useAuth();
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const isRtl = i18n.language === 'ar';
 
     const [messages, setMessages] = useState<Message[]>([
@@ -74,6 +74,8 @@ const AIChatBot: React.FC = () => {
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, errorMsg]);
+        } finally {
+            setIsTyping(false);
         }
     };
 
@@ -148,8 +150,8 @@ const AIChatBot: React.FC = () => {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder="اكتب سؤالك... / Ask anything..."
-                            className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-3 pl-4 pr-12 focus:ring-2 focus:ring-primary focus:outline-none text-sm"
+                            placeholder={t('chatbot.placeholder', 'Ask anything...')}
+                            className={`w-full bg-slate-100 dark:bg-slate-800 border-none rounded-full py-3 focus:ring-2 focus:ring-primary focus:outline-none text-sm ${isRtl ? 'pr-4 pl-12' : 'pl-4 pr-12'}`}
                         />
                         <button
                             type="submit"

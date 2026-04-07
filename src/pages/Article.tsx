@@ -269,7 +269,7 @@ const Article: React.FC = () => {
                         </div>
                         <div className="glass-panel px-4 py-2 rounded-full flex items-center gap-2 bg-white/50 dark:bg-slate-900/50">
                             <Clock size={14} className="text-indigo-500" />
-                            <span>3 min read</span>
+                            <span>{t('common.min_read', { count: 3 })}</span>
                         </div>
                     </div>
 

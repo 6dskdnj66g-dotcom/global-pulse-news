@@ -22,6 +22,7 @@ const Footer: React.FC = () => {
                 { name: 'Economy', nameAr: 'اقتصاد', path: '/category/economy' },
                 { name: 'Technology', nameAr: 'تكنولوجيا', path: '/category/technology' },
                 { name: 'Sports', nameAr: 'رياضة', path: '/category/sports' },
+                { name: 'Health', nameAr: 'صحة', path: '/category/health' },
             ]
         },
         {
@@ -159,7 +160,7 @@ const Footer: React.FC = () => {
                     <div className="flex gap-6">
                         <Link to="/privacy" className="hover:text-white transition-colors">PRIVACY</Link>
                         <Link to="/terms" className="hover:text-white transition-colors">TERMS</Link>
-                        <Link to="/sitemap.xml" className="hover:text-white transition-colors">SITEMAP</Link>
+                        <Link to="/" className="hover:text-white transition-colors">HOME</Link>
                     </div>
                 </div>
             </div>

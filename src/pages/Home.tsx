@@ -20,6 +20,12 @@ const Home: React.FC = () => {
     const [translatedArticles, setTranslatedArticles] = useState<Article[]>([]);
     const { isSaved, toggleSave } = useSavedArticles();
     const [currentBreakingIndex, setCurrentBreakingIndex] = useState(0);
+    const [toast, setToast] = useState<string | null>(null);
+
+    const showToast = (msg: string) => {
+        setToast(msg);
+        setTimeout(() => setToast(null), 2500);
+    };
 
     const isRtl = i18n.dir() === 'rtl';
 
@@ -121,6 +127,14 @@ const Home: React.FC = () => {
             <div className="min-h-screen pb-20 overflow-hidden relative">
                 {/* Aurora Background Effects */}
                 <div className="fixed top-0 left-0 w-full h-[800px] bg-aurora opacity-10 dark:opacity-20 blur-[120px] -z-10 animate-pulse-slow pointer-events-none" />
+
+                {/* Toast Notification */}
+                {toast && (
+                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold text-sm shadow-2xl shadow-black/30 animate-fade-in flex items-center gap-2">
+                        <span className="text-green-400 dark:text-green-600">✓</span>
+                        {toast}
+                    </div>
+                )}
 
                 {/* Hero Section with 3D Float Effect */}
                 <section className="relative pt-32 pb-12 px-4">
@@ -310,7 +324,7 @@ const Home: React.FC = () => {
                                                             // Fallback: copy to clipboard
                                                             try {
                                                                 await navigator.clipboard.writeText(shareUrl);
-                                                                alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                                                showToast(t('common.link_copied', 'Link copied!'));
                                                             } catch (err) {
                                                                 // Fallback for older browsers
                                                                 const textArea = document.createElement('textarea');
@@ -319,7 +333,7 @@ const Home: React.FC = () => {
                                                                 textArea.select();
                                                                 document.execCommand('copy');
                                                                 document.body.removeChild(textArea);
-                                                                alert(isRtl ? 'تم نسخ الرابط!' : 'Link copied!');
+                                                                showToast(t('common.link_copied', 'Link copied!'));
                                                             }
                                                         }}
                                                         className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"

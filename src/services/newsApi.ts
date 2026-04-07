@@ -46,7 +46,7 @@ export const fetchNews = async (category?: string): Promise<Article[]> => {
             excerpt: item.description || '',
             content: item.content || undefined,
             category: category ? (category.charAt(0).toUpperCase() + category.slice(1)) as any : 'General',
-            imageUrl: item.urlToImage || 'https://via.placeholder.com/600x400?text=No+Image', // Fallback image
+            imageUrl: item.urlToImage || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?auto=format&fit=crop&q=80&w=600', // Fallback image
             date: new Date(item.publishedAt).toLocaleDateString(),
             author: item.author || 'Unknown',
             source: item.source.name,

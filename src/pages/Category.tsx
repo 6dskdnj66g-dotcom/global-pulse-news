@@ -64,7 +64,7 @@ const CategoryPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="text-center py-16 text-slate-500">
-                        <p>Loading live news from global sources...</p>
+                        <p>{i18n.language === 'ar' ? `لا توجد أخبار متاحة حالياً في قسم ${displayTitle}. حاول مرة أخرى.` : `No articles found in ${displayTitle}. Please try again later.`}</p>
                     </div>
                 )}
             </div>

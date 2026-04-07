@@ -1,9 +1,6 @@
 // Gemini AI Service - Professional AI Chatbot Integration
 // Uses Google's Gemini API for intelligent responses
 
-// Gemini API keys should be set in Vercel Environment Variables
-// The backend function /api/gemini handles the secret key securely
-
 interface GeminiResponse {
     text: string;
 }
@@ -29,58 +26,85 @@ Guidelines:
 
 You are integrated into a news website called "Global Pulse | النبض العالمي".`;
 
+// Direct Gemini API (used in DEV if VITE_GEMINI_API_KEY is set)
+const DIRECT_GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const DEV_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+
+const callGeminiDirect = async (contents: object[], generationConfig: object): Promise<string> => {
+    const response = await fetch(`${DIRECT_GEMINI_URL}?key=${DEV_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents, generationConfig })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(`Direct API Error: ${response.status} ${errorData.error?.message || ''}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    if (!text) throw new Error('No content from direct API');
+    return text;
+};
+
+const callGeminiBackend = async (contents: object[], generationConfig: object): Promise<string> => {
+    const apiUrl = '/api/gemini';
+    const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents, generationConfig })
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || response.statusText;
+        console.error('Gemini API Error Details:', errorData);
+
+        if (response.status === 500) {
+            return `⚠️ Server Error: ${errorData.details || errorData.error || 'Please try again later'}`;
+        }
+        if (response.status === 429) return `⚠️ Rate limit exceeded. Try again later.`;
+
+        throw new Error(`API Request Failed: ${response.status} ${errorMessage}`);
+    }
+
+    const data = await response.json() as GeminiResponse;
+    if (data.text) return data.text;
+    return "⚠️ No content generated. Try rephrasing.";
+};
+
 export const askGeminiAI = async (userMessage: string): Promise<string> => {
+    const contents = [
+        {
+            role: 'user',
+            parts: [
+                { text: SYSTEM_CONTEXT },
+                { text: `User question: ${userMessage}` }
+            ]
+        }
+    ];
+    const generationConfig = {
+        temperature: 0.7,
+        maxOutputTokens: 1024,
+    };
+
     try {
-        // In development (localhost), point to the live Vercel backend
-        // In production, use relative path
-        const apiUrl = import.meta.env.DEV
-            ? 'https://globalpulse.social/api/gemini'
-            : '/api/gemini';
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [
-                            { text: SYSTEM_CONTEXT },
-                            { text: `User question: ${userMessage}` }
-                        ]
-                    }
-                ],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 1024,
-                }
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const errorMessage = errorData.error || response.statusText;
-            console.error('Gemini API Error Details:', errorData);
-
-            if (response.status === 500) {
-                return `⚠️ Server Error: ${errorData.details || errorData.error || 'Please try again later'}`;
-            }
-            if (response.status === 429) return `⚠️ Rate limit exceeded. Try again later.`;
-
-            throw new Error(`API Request Failed: ${response.status} ${errorMessage}`);
+        // In DEV mode: use direct Gemini API if key available, else try production backend
+        if (import.meta.env.DEV && DEV_API_KEY) {
+            return await callGeminiDirect(contents, generationConfig);
         }
-
-        const data = await response.json() as GeminiResponse;
-
-        if (data.text) {
-            return data.text;
-        }
-
-        return "⚠️ No content generated. Try rephrasing.";
-
+        // In production (or DEV without key): use backend endpoint
+        return await callGeminiBackend(contents, generationConfig);
     } catch (error: any) {
+        // If direct API failed in DEV, try backend as fallback
+        if (import.meta.env.DEV && DEV_API_KEY) {
+            try {
+                return await callGeminiBackend(contents, generationConfig);
+            } catch {
+                // both failed
+            }
+        }
         console.error('Gemini AI Fetch Error:', error);
         return `⚠️ Connection Error: ${error.message}`;
     }
@@ -103,44 +127,36 @@ Guidelines:
 
 
 export const expandArticleContent = async (title: string, excerpt: string, category: string): Promise<string> => {
-    try {
-        const apiUrl = import.meta.env.DEV
-            ? 'https://globalpulse.social/api/gemini'
-            : '/api/gemini';
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                contents: [
-                    {
-                        role: 'user',
-                        parts: [
-                            { text: ARTICLE_EXPANSION_PROMPT },
-                            { text: `Category: ${category}\nHeadline: ${title}\nBrief: ${excerpt}\n\nWrite the expanded article content:` }
-                        ]
-                    }
-                ],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 2048,
-                }
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Gemini Expansion Error:', errorData);
-            return ''; // Return empty on error, will fall back to original content
+    const contents = [
+        {
+            role: 'user',
+            parts: [
+                { text: ARTICLE_EXPANSION_PROMPT },
+                { text: `Category: ${category}\nHeadline: ${title}\nBrief: ${excerpt}\n\nWrite the expanded article content:` }
+            ]
         }
+    ];
+    const generationConfig = {
+        temperature: 0.7,
+        maxOutputTokens: 2048,
+    };
 
-        const data = await response.json() as GeminiResponse;
-        return data.text || '';
-
+    try {
+        // In DEV mode: use direct Gemini API if key available
+        if (import.meta.env.DEV && DEV_API_KEY) {
+            return await callGeminiDirect(contents, generationConfig);
+        }
+        return await callGeminiBackend(contents, generationConfig);
     } catch (error: any) {
+        // If direct API failed in DEV, try backend as fallback
+        if (import.meta.env.DEV && DEV_API_KEY) {
+            try {
+                return await callGeminiBackend(contents, generationConfig);
+            } catch {
+                // both failed
+            }
+        }
         console.error('Article Expansion Error:', error);
-        return '';
+        return ''; // Return empty on error, will fall back to original content
     }
 };
