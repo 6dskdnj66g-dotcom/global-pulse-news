@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Send, Mail, CheckCircle } from 'lucide-react';
+import { Send, Mail, CheckCircle, Loader2 } from 'lucide-react';
+import { saveContactMessage } from '../../services/contactService';
 
 const Footer: React.FC = () => {
     const { i18n } = useTranslation();
@@ -11,6 +12,7 @@ const Footer: React.FC = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [sent, setSent] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Footer links with actual working routes
     const footerSections = [
@@ -36,15 +38,22 @@ const Footer: React.FC = () => {
         }
     ];
 
-    const handleContact = (e: React.FormEvent) => {
+    const handleContact = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Open email client safely without triggering popup blockers
-        const mailtoLink = `mailto:contact@globalpulse.news?subject=Contact from Global Pulse&body=${encodeURIComponent(message)}%0A%0AFrom: ${encodeURIComponent(email)}`;
-        window.location.href = mailtoLink;
-        setSent(true);
-        setTimeout(() => setSent(false), 3000);
-        setEmail('');
-        setMessage('');
+        if (!email.trim() || !message.trim()) return;
+        
+        setIsSubmitting(true);
+        const success = await saveContactMessage(email, message);
+        setIsSubmitting(false);
+
+        if (success) {
+            setSent(true);
+            setTimeout(() => setSent(false), 3000);
+            setEmail('');
+            setMessage('');
+        } else {
+            alert(isRtl ? 'حدث خطأ، يرجى المحاولة لاحقاً' : 'Error sending message, try again late');
+        }
     };
 
     return (
@@ -83,10 +92,17 @@ const Footer: React.FC = () => {
                                 />
                                 <button
                                     type="submit"
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 flex items-center gap-2"
+                                    disabled={isSubmitting || sent}
+                                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 flex items-center gap-2"
                                 >
-                                    {sent ? <CheckCircle size={20} /> : <Send size={20} />}
-                                    {sent ? (isRtl ? 'تم!' : 'Sent!') : (isRtl ? 'إرسال' : 'Send')}
+                                    {isSubmitting ? (
+                                        <Loader2 size={20} className="animate-spin" />
+                                    ) : sent ? (
+                                        <CheckCircle size={20} />
+                                    ) : (
+                                        <Send size={20} />
+                                    )}
+                                    {isSubmitting ? (isRtl ? 'جاري...' : 'Sending...') : sent ? (isRtl ? 'تم!' : 'Sent!') : (isRtl ? 'إرسال' : 'Send')}
                                 </button>
                             </div>
                         </form>
