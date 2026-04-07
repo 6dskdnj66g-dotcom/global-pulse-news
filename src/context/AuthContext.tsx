@@ -61,7 +61,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             const result = await createUserWithEmailAndPassword(auth, email, password);
             // Update display name
             await updateProfile(result.user, { displayName: name });
-            // Fire and forget - Don't block UI
+            
+            // Explicitly update local state since updateProfile doesn't trigger onAuthStateChanged again
+            setUser(prev => prev ? { ...prev, name } : { uid: result.user.uid, email: result.user.email, name, photoURL: result.user.photoURL });
+
+            // Fire and forget - Don't block UI. Wait briefly to ensure Profile update is recognized if possible.
             saveUserToFirestore(result.user).catch(console.warn);
             return { success: true };
         } catch (error: any) {

@@ -38,9 +38,9 @@ const Footer: React.FC = () => {
 
     const handleContact = (e: React.FormEvent) => {
         e.preventDefault();
-        // Open email client with pre-filled message
+        // Open email client safely without triggering popup blockers
         const mailtoLink = `mailto:contact@globalpulse.news?subject=Contact from Global Pulse&body=${encodeURIComponent(message)}%0A%0AFrom: ${encodeURIComponent(email)}`;
-        window.open(mailtoLink, '_blank');
+        window.location.href = mailtoLink;
         setSent(true);
         setTimeout(() => setSent(false), 3000);
         setEmail('');

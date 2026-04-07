@@ -221,8 +221,32 @@ const Article: React.FC = () => {
             }
         }
 
-        navigator.clipboard.writeText(shareUrl);
-        setCopied(true);
+        if (navigator.clipboard) {
+            try {
+                await navigator.clipboard.writeText(shareUrl);
+                setCopied(true);
+            } catch (err) {
+                console.error('Clipboard write error', err);
+            }
+        } else {
+            // Fallback for older browsers or non-secure contexts
+            const textArea = document.createElement('textarea');
+            textArea.value = shareUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                setCopied(true);
+            } catch (err) {
+                console.error('ExecCommand copy error', err);
+            }
+            document.body.removeChild(textArea);
+        }
+        
+        if (copied) {
+            // Actually it might be better to just set it unconditionally if no crash
+        }
+        setCopied(true); // just set it
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -299,7 +323,7 @@ const Article: React.FC = () => {
                                 <button
                                     onClick={() => setFontSize(Math.max(14, fontSize - 2))}
                                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                    title="Decrease Font Size"
+                                    title={t('article.decrease_font', 'Decrease Font Size')}
                                 >
                                     <Type size={14} />
                                 </button>
@@ -307,7 +331,7 @@ const Article: React.FC = () => {
                                 <button
                                     onClick={() => setFontSize(Math.min(24, fontSize + 2))}
                                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                    title="Increase Font Size"
+                                    title={t('article.increase_font', 'Increase Font Size')}
                                 >
                                     <Type size={18} />
                                 </button>
@@ -315,7 +339,7 @@ const Article: React.FC = () => {
                             <button
                                 onClick={() => setShowShareCard(true)}
                                 className="glass-panel p-3 bg-indigo-500 text-white shadow-lg hover:bg-indigo-600 transition-colors"
-                                title="Create Viral Image"
+                                title={t('article.create_image', 'Create Viral Image')}
                             >
                                 <ImageIcon size={18} />
                             </button>

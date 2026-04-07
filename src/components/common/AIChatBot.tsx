@@ -156,9 +156,9 @@ const AIChatBot: React.FC = () => {
                         <button
                             type="submit"
                             disabled={!input.trim()}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-colors"
+                            className={`absolute ${isRtl ? 'left-2' : 'right-2'} top-1/2 -translate-y-1/2 p-2 bg-primary text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-hover transition-colors`}
                         >
-                            <Send size={16} />
+                            <Send size={16} className={isRtl ? 'rotate-180' : ''} />
                         </button>
                     </div>
                 </form>
