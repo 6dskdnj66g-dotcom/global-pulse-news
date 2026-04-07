@@ -9,6 +9,7 @@ import { saveArticleToDb, generateArticleId } from '../services/articleService';
 import { translateToArabic } from '../services/translationService';
 import { ArrowRight, Share2, Clock, Bookmark } from 'lucide-react';
 import { useSavedArticles } from '../hooks/useSavedArticles';
+import PwaPromoBanner from '../components/common/PwaPromoBanner';
 
 const Home: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -188,6 +189,8 @@ const Home: React.FC = () => {
                         </div>
                     </div>
                 </section>
+
+                <PwaPromoBanner />
 
                 {/* Main Content */}
                 <main className="container max-w-7xl mx-auto px-4 mt-8">
