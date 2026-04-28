@@ -1,7 +1,7 @@
-// Gemini AI Service - Professional AI Chatbot Integration
-// Uses Google's Gemini API for intelligent responses
+// AI Service - Professional AI Chatbot Integration
+// Uses Groq API for intelligent, high-speed responses
 
-interface GeminiResponse {
+interface AIResponse {
     text: string;
 }
 
@@ -26,15 +26,23 @@ Guidelines:
 
 You are integrated into a news website called "Global Pulse | النبض العالمي".`;
 
-// Direct Gemini API (used in DEV if VITE_GEMINI_API_KEY is set)
-const DIRECT_GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
-const DEV_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
+// Direct API (used in DEV if VITE_GROQ_API_KEY is set)
+const DIRECT_GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const DEV_API_KEY = import.meta.env.VITE_GROQ_API_KEY || '';
 
-const callGeminiDirect = async (contents: object[], generationConfig: object): Promise<string> => {
-    const response = await fetch(`${DIRECT_GEMINI_URL}?key=${DEV_API_KEY}`, {
+const callAIDirect = async (messages: object[], generationConfig: any): Promise<string> => {
+    const response = await fetch(DIRECT_GROQ_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents, generationConfig })
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEV_API_KEY}`
+        },
+        body: JSON.stringify({ 
+            messages, 
+            model: "llama-3.3-70b-versatile",
+            temperature: generationConfig.temperature,
+            max_completion_tokens: generationConfig.maxOutputTokens
+        })
     });
 
     if (!response.ok) {
@@ -43,23 +51,23 @@ const callGeminiDirect = async (contents: object[], generationConfig: object): P
     }
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const text = data.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error('No content from direct API');
     return text;
 };
 
-const callGeminiBackend = async (contents: object[], generationConfig: object): Promise<string> => {
-    const apiUrl = '/api/gemini';
+const callAIBackend = async (messages: object[], generationConfig: any): Promise<string> => {
+    const apiUrl = '/api/groq';
     const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents, generationConfig })
+        body: JSON.stringify({ messages, generationConfig })
     });
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.error || response.statusText;
-        console.error('Gemini API Error Details:', errorData);
+        console.error('AI API Error Details:', errorData);
 
         if (response.status === 500) {
             return `⚠️ Server Error: ${errorData.details || errorData.error || 'Please try again later'}`;
@@ -69,43 +77,39 @@ const callGeminiBackend = async (contents: object[], generationConfig: object): 
         throw new Error(`API Request Failed: ${response.status} ${errorMessage}`);
     }
 
-    const data = await response.json() as GeminiResponse;
+    const data = await response.json() as AIResponse;
     if (data.text) return data.text;
     return "⚠️ No content generated. Try rephrasing.";
 };
 
-export const askGeminiAI = async (userMessage: string): Promise<string> => {
-    const contents = [
-        {
-            role: 'user',
-            parts: [
-                { text: SYSTEM_CONTEXT },
-                { text: `User question: ${userMessage}` }
-            ]
-        }
+export const askAI = async (userMessage: string): Promise<string> => {
+    const messages = [
+        { role: 'system', content: SYSTEM_CONTEXT },
+        { role: 'user', content: userMessage }
     ];
+    
     const generationConfig = {
         temperature: 0.7,
         maxOutputTokens: 1024,
     };
 
     try {
-        // In DEV mode: use direct Gemini API if key available, else try production backend
+        // In DEV mode: use direct API if key available, else try production backend
         if (import.meta.env.DEV && DEV_API_KEY) {
-            return await callGeminiDirect(contents, generationConfig);
+            return await callAIDirect(messages, generationConfig);
         }
         // In production (or DEV without key): use backend endpoint
-        return await callGeminiBackend(contents, generationConfig);
+        return await callAIBackend(messages, generationConfig);
     } catch (error: any) {
         // If direct API failed in DEV, try backend as fallback
         if (import.meta.env.DEV && DEV_API_KEY) {
             try {
-                return await callGeminiBackend(contents, generationConfig);
+                return await callAIBackend(messages, generationConfig);
             } catch {
                 // both failed
             }
         }
-        console.error('Gemini AI Fetch Error:', error);
+        console.error('AI Fetch Error:', error);
         return `⚠️ Connection Error: ${error.message}`;
     }
 };
@@ -127,14 +131,9 @@ Guidelines:
 
 
 export const expandArticleContent = async (title: string, excerpt: string, category: string): Promise<string> => {
-    const contents = [
-        {
-            role: 'user',
-            parts: [
-                { text: ARTICLE_EXPANSION_PROMPT },
-                { text: `Category: ${category}\nHeadline: ${title}\nBrief: ${excerpt}\n\nWrite the expanded article content:` }
-            ]
-        }
+    const messages = [
+        { role: 'system', content: ARTICLE_EXPANSION_PROMPT },
+        { role: 'user', content: `Category: ${category}\nHeadline: ${title}\nBrief: ${excerpt}\n\nWrite the expanded article content:` }
     ];
     const generationConfig = {
         temperature: 0.7,
@@ -142,16 +141,16 @@ export const expandArticleContent = async (title: string, excerpt: string, categ
     };
 
     try {
-        // In DEV mode: use direct Gemini API if key available
+        // In DEV mode: use direct API if key available
         if (import.meta.env.DEV && DEV_API_KEY) {
-            return await callGeminiDirect(contents, generationConfig);
+            return await callAIDirect(messages, generationConfig);
         }
-        return await callGeminiBackend(contents, generationConfig);
+        return await callAIBackend(messages, generationConfig);
     } catch (error: any) {
         // If direct API failed in DEV, try backend as fallback
         if (import.meta.env.DEV && DEV_API_KEY) {
             try {
-                return await callGeminiBackend(contents, generationConfig);
+                return await callAIBackend(messages, generationConfig);
             } catch {
                 // both failed
             }

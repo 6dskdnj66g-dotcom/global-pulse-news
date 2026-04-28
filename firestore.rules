@@ -36,6 +36,13 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
+    // === CONTACT MESSAGES ===
+    // Anyone can send a message, but no one can read them except admins (Firebase Console)
+    match /contact_messages/{message} {
+      allow create: if true;
+      allow read, update, delete: if false; 
+    }
+
     // === DEFAULT DENY ===
     // Everything else is blocked.
     match /{document=**} {

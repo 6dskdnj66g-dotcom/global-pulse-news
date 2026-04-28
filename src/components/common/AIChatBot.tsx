@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { askGeminiAI } from '../../services/geminiService';
+import { askAI } from '../../services/aiService';
 
 interface Message {
     id: string;
@@ -54,9 +54,9 @@ const AIChatBot: React.FC = () => {
         setInput('');
         setIsTyping(true);
 
-        // Call Gemini AI for intelligent response
+        // Call AI for intelligent response
         try {
-            const responseText = await askGeminiAI(userMsg.text);
+            const responseText = await askAI(userMsg.text);
             const aiMsg: Message = {
                 id: (Date.now() + 1).toString(),
                 text: responseText,

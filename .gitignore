@@ -118,3 +118,4 @@ dist
 # Windows
 Thumbs.db
 Desktop.ini
+.vercel

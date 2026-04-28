@@ -9,7 +9,7 @@ import AudioPlayer from '../components/article/AudioPlayer';
 import ShareCard from '../components/article/ShareCard';
 
 import { saveArticleToDb, getArticleFromDb, generateArticleId } from '../services/articleService';
-import { expandArticleContent } from '../services/geminiService';
+import { expandArticleContent } from '../services/aiService';
 
 const Article: React.FC = () => {
     const { id } = useParams<{ id: string }>();

@@ -17,16 +17,14 @@ export const translateToArabic = async (text: string): Promise<string> => {
     }
 
     try {
-        // SECURITY FIX: Route through Backend to prevent exposing GEMINI_API_KEY
-        const response = await fetch('/api/gemini', {
+        // SECURITY FIX: Route through Backend to prevent exposing API_KEY
+        const response = await fetch('/api/groq', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{
+                messages: [{
                     role: 'user',
-                    parts: [{
-                        text: `Translate the following text to Arabic. Return ONLY the Arabic translation, nothing else:\n\n"${text}"`
-                    }]
+                    content: `Translate the following text to Arabic. Return ONLY the Arabic translation, nothing else:\n\n"${text}"`
                 }],
                 generationConfig: {
                     temperature: 0.3,

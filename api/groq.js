@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import Groq from 'groq-sdk';
 
 export default async function handler(req, res) {
     // CORS configuration
@@ -27,8 +27,8 @@ export default async function handler(req, res) {
     }
 
     // === INPUT VALIDATION ===
-    if (!req.body || !req.body.contents) {
-        return res.status(400).json({ error: 'Invalid request body' });
+    if (!req.body || !req.body.messages) {
+        return res.status(400).json({ error: 'Invalid request body, expected messages array' });
     }
 
     // Rate Limiting / Abuse Prevention (Content Length)
@@ -37,10 +37,10 @@ export default async function handler(req, res) {
         return res.status(413).json({ error: 'Payload too large' });
     }
 
-    const { contents, generationConfig } = req.body;
+    const { messages, generationConfig } = req.body;
     
     // BACKUP: Support both env variable naming conventions
-    const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY || process.env.VITE_GROQ_API_KEY;
 
     if (!apiKey) {
         console.error('SERVER ERROR: API KEY is completely missing from environment variables');
@@ -51,32 +51,27 @@ export default async function handler(req, res) {
     }
 
     try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        // Use gemini-1.5-flash-latest as a fallback since 2.0 returned quota 0
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
+        const groq = new Groq({ apiKey });
 
-        const result = await model.generateContent({
-            contents: contents,
-            generationConfig: {
-                ...generationConfig,
-                maxOutputTokens: Math.min(generationConfig?.maxOutputTokens || 1024, 2048)
-            }
+        const chatCompletion = await groq.chat.completions.create({
+            messages: messages,
+            model: "llama-3.3-70b-versatile",
+            temperature: generationConfig?.temperature || 0.7,
+            max_completion_tokens: Math.min(generationConfig?.maxOutputTokens || 1024, 2048)
         });
 
-        const response = await result.response;
+        const text = chatCompletion.choices[0]?.message?.content || "";
+        
         // Verify response exists
-        if (!response) {
-            throw new Error("No response string received from Google AI.");
+        if (!text) {
+            throw new Error("No response string received from Groq.");
         }
         
-        const text = response.text();
         return res.status(200).json({ text });
 
     } catch (error) {
-        console.error('Gemini API Critical Error:', error); 
+        console.error('Groq API Critical Error:', error); 
 
-        // THE FIX: Exclude giant stack traces, but expose the CORE error condition
-        // e.g., "API key not valid", "User location is not supported"
         return res.status(500).json({
             error: 'AI content generation failed',
             details: error.message || 'Unknown upstream service error occurred.'
